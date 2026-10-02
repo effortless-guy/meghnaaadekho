@@ -11,3 +11,4 @@
 
 - Wedding content lives in the shared `WeddingData` model; templates consume it and own independent visual composition, because new templates must not become palette swaps.
 - Invitation audio uses the selected custom track when present and otherwise falls back to the bundled original processional, so every guest experience has music without requiring setup.
+- The public home and slug URLs render one JSON-backed invitation directly; the editor is not part of the guest journey.

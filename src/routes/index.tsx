@@ -1,22 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { InvitationStudio } from "@/components/invitation-studio";
+import { WeddingInvitation } from "@/components/wedding-invitation";
+import { weddingData } from "@/lib/wedding-data";
 
 // No head() here: the home route inherits title/description/og/twitter from
 // __root.tsx, and ships no og:image so serve-time hosting can inject the
 // project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [
-    { title: "Vow & Vine — Digital Wedding Invitation Atelier" },
-    { name: "description", content: "Create a handcrafted digital wedding invitation with elegant templates and live preview." },
-    { property: "og:title", content: "Vow & Vine — Digital Wedding Invitation Atelier" },
-    { property: "og:description", content: "Create a handcrafted digital wedding invitation with elegant templates and live preview." },
+    { title: `${weddingData.couple.groom} & ${weddingData.couple.bride} — Wedding Invitation` },
+    { name: "description", content: `You are invited to celebrate the wedding of ${weddingData.couple.groom} and ${weddingData.couple.bride}.` },
+    { property: "og:title", content: `${weddingData.couple.groom} & ${weddingData.couple.bride}` },
+    { property: "og:description", content: "Open our Sacred Garden wedding invitation." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary_large_image" },
   ]}),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
-  return <InvitationStudio />;
+  return <WeddingInvitation data={weddingData} />;
 }
