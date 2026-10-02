@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { CalendarDays, Check, MapPin, Music2, Pause, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,8 @@ import type { WeddingData } from "@/lib/wedding-data";
 import sacredHero from "@/assets/sacred-garden-hero.jpg";
 import royalHero from "@/assets/royal-celebration-hero.jpg";
 import detailPhoto from "@/assets/wedding-detail.jpg";
-import embossedBotanicals from "@/assets/embossed-envelope-botanicals.png";
+import envelopePaper from "@/assets/envelope-paper.jpg.asset.json";
+import waxSeal from "@/assets/wax-seal.png.asset.json";
 import royalProcessional from "@/assets/royal-wedding-processional.wav.asset.json";
 
 function initials(data: WeddingData) {
