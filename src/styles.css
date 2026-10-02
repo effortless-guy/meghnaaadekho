@@ -352,3 +352,53 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .invitation .portrait-panel.reveal > img, .invitation .photo-interlude.reveal > img { opacity: 1; transform: scale(1.08); transition: transform 2.4s cubic-bezier(.2,.7,.2,1); }
 .invitation .portrait-panel.reveal.is-visible > img, .invitation .photo-interlude.reveal.is-visible > img { transform: scale(1); }
 @media (prefers-reduced-motion: reduce) { .invitation .reveal, .invitation .reveal > *:not(.floral-edge) { opacity: 1; transform: none; transition: none; } }
+
+/* Devotional opening, scratch reveal, and softer story transitions */
+.envelope-prompt { position: absolute; z-index: 4; left: 50%; bottom: max(22px, calc(env(safe-area-inset-bottom) + 16px)); display: grid; justify-items: center; gap: 7px; margin: 0; translate: -50% 0; color: color-mix(in oklab, var(--burgundy) 72%, var(--invite-ink)); font: 500 9px/1 Marcellus, serif; text-transform: uppercase; letter-spacing: .24em; pointer-events: none; transition: opacity .8s ease; }
+.envelope-prompt span { font-size: 18px; line-height: 1; animation: prompt-lift 1.8s ease-in-out infinite; }
+.envelope-gate.is-opening .envelope-prompt { opacity: 0; }
+@keyframes prompt-lift { 50% { translate: 0 -5px; } }
+
+.blessing-section { min-height: 100svh; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 68px 30px; text-align: center; color: oklch(0.94 0.025 78); background-color: var(--burgundy); background-image: radial-gradient(circle at 50% 36%, color-mix(in oklab, var(--terracotta) 32%, transparent), transparent 46%), repeating-linear-gradient(102deg, transparent 0 4px, color-mix(in oklab, var(--primary-foreground) 2.5%, transparent) 4px 5px); }
+.invitation-story > .blessing-section::after, .invitation-story > .save-date-section::after { display: none; }
+.blessing-section::before { content: ""; position: absolute; inset: 15px; border: 1px solid color-mix(in oklab, var(--gold) 36%, transparent); pointer-events: none; }
+.blessing-section img { width: 118px; height: 118px; object-fit: contain; margin-bottom: 26px; filter: sepia(.35) brightness(1.7) drop-shadow(0 5px 16px color-mix(in oklab, var(--foreground) 24%, transparent)); }
+.blessing-rule { width: 46px; height: 1px; margin-bottom: 28px; background: var(--gold); opacity: .75; }
+.blessing-section p { font: 400 18px/1.5 "Cormorant Garamond", serif; }
+.blessing-section h1 { max-width: 275px; margin-top: 6px; font: 400 24px/1.25 "Cormorant Garamond", serif; }
+.blessing-section h2 { margin-top: 24px; color: oklch(0.8 0.09 78); font: 500 39px/1 "Cormorant Garamond", serif; }
+.blessing-section h2 i { font-weight: 400; }
+.blessing-section small { margin-top: 18px; font: 400 9px/1 Marcellus, serif; text-transform: uppercase; letter-spacing: .2em; }
+
+.save-date-section { min-height: 76svh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 88px 22px; color: var(--primary-foreground); text-align: center; background-color: var(--burgundy); background-image: repeating-linear-gradient(97deg, transparent 0 4px, color-mix(in oklab, var(--primary-foreground) 2.5%, transparent) 4px 5px); }
+.save-date-section::before { content: ""; position: absolute; inset: 14px; border: 1px solid color-mix(in oklab, var(--gold) 38%, transparent); pointer-events: none; }
+.save-date-section .kicker { color: var(--gold); font-weight: 700; }
+.save-date-section h2 { margin: 20px 0 34px; color: oklch(0.95 0.02 82); font: 400 24px/1.3 "Cormorant Garamond", serif; }
+.scratch-hearts { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.scratch-heart { position: relative; aspect-ratio: 1; display: grid; place-items: center; }
+.scratch-heart > div { display: grid; gap: 2px; color: var(--burgundy); }
+.scratch-heart small { font: 600 7px/1 Marcellus, serif; text-transform: uppercase; letter-spacing: .12em; }
+.scratch-heart strong { font: 500 23px/1 "Cormorant Garamond", serif; }
+.scratch-heart canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; transition: opacity .8s ease, transform .8s ease; }
+.scratch-heart.is-revealed canvas { opacity: 0; transform: scale(.9); pointer-events: none; }
+.scratch-note { margin-top: 24px; color: color-mix(in oklab, var(--primary-foreground) 72%, transparent); font: 400 8px/1 Marcellus, serif; text-transform: uppercase; letter-spacing: .16em; }
+
+.venue-section { padding-bottom: 72px; }
+.venue-art { width: calc(100% + 18px); max-height: 360px; margin: 0 -9px 30px; object-fit: cover; object-position: center 42%; border-block: 1px solid color-mix(in oklab, var(--invite-metal) 30%, transparent); mask-image: linear-gradient(to bottom, transparent, black 9%, black 91%, transparent); }
+
+.invitation .reveal { opacity: 0; transform: scale(1.018); filter: blur(5px); transition: opacity 1.6s cubic-bezier(.22,.61,.36,1), transform 2s cubic-bezier(.22,.61,.36,1), filter 1.5s ease; }
+.invitation .reveal > *:not(.floral-edge) { opacity: 0; transform: scale(.985); transition: opacity 1.35s ease, transform 1.7s cubic-bezier(.22,.61,.36,1); }
+.invitation .reveal.is-visible, .invitation .reveal.is-visible > *:not(.floral-edge) { opacity: 1; transform: none; filter: none; }
+
+@media (max-width: 390px) {
+  body:has(.invitation) { margin: 0; padding: 0; overflow-x: hidden; }
+  .envelope-gate { place-items: stretch center; background: var(--gate-bg); }
+  .envelope { width: 100vw; height: 100svh; max-width: none; aspect-ratio: auto; filter: none; }
+  .env-front { background-size: cover; }
+  .envelope-prompt { bottom: max(18px, calc(env(safe-area-inset-bottom) + 12px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .envelope-prompt span { animation: none; }
+  .invitation .reveal, .invitation .reveal > *:not(.floral-edge) { opacity: 1; transform: none; filter: none; transition: none; }
+}
