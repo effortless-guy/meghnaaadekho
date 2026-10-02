@@ -10,7 +10,7 @@ import type { WeddingData } from "@/lib/wedding-data";
 import sacredHero from "@/assets/sacred-garden-hero.jpg";
 import royalHero from "@/assets/royal-celebration-hero.jpg";
 import detailPhoto from "@/assets/wedding-detail.jpg";
-import envelopePaper from "@/assets/envelope-paper.jpg.asset.json";
+import envelopePaper from "@/assets/envelope-paper-clean.jpg";
 import waxSeal from "@/assets/wax-seal.png.asset.json";
 import classicalTune from "@/assets/classical-canon.mp3.asset.json";
 import archLoop from "@/assets/arch-swan-loop.mp4.asset.json";
@@ -204,7 +204,7 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   return <main className={`invitation ${royal ? "royal" : "garden"} ${preview ? "is-preview" : ""} ${opened ? "is-open" : "is-closed"}`}>
     <audio ref={audio} src={audioSrc} loop preload="auto" />
     {!gateGone && <div className={`envelope-gate ${opening ? "is-opening" : ""} ${opened ? "is-leaving" : ""}`} onClick={open}>
-      <div className="envelope" onClick={open} style={{ "--env-paper": `url(${envelopePaper.url})` } as CSSProperties}>
+      <div className="envelope" onClick={open} style={{ "--env-paper": `url(${envelopePaper})` } as CSSProperties}>
         <div className="envelope-glow" aria-hidden />
         {(["left", "right", "bottom", "top"] as const).map((side) => <div key={side} className={`env-flap env-flap-${side}`} aria-hidden><div className="env-face env-front" /><div className="env-face env-back" /></div>)}
         <div className="envelope-shine" aria-hidden />
