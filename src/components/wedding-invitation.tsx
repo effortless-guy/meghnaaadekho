@@ -93,7 +93,7 @@ function Rsvp({ invitationId, couple }: { invitationId?: string; couple: Wedding
 }
 
 export function WeddingInvitation({ data, invitationId, preview = false }: { data: WeddingData; invitationId?: string; preview?: boolean }) {
-  const [opened, setOpened] = useState(preview);
+  const [opened, setOpened] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
@@ -108,7 +108,7 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       try { await audio.current.play(); setPlaying(true); } catch { setPlaying(false); }
     }
   }
-  return <main className={`invitation ${royal ? "royal" : "garden"} ${opened ? "is-open" : "is-closed"}`}>
+  return <main className={`invitation ${royal ? "royal" : "garden"} ${preview ? "is-preview" : ""} ${opened ? "is-open" : "is-closed"}`}>
     <audio ref={audio} src={audioSrc} loop preload="auto" />
     {!opened && <div className="envelope-gate">
       <div className="envelope" aria-hidden>
