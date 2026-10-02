@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Check, MapPin, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,8 +46,6 @@ function Countdown({ date }: { date: string }) {
 
 function ScratchHeart({ label, value }: { label: string; value: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const drawing = useRef(false);
-  const scratchMoves = useRef(0);
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -77,39 +75,15 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
     context.fillRect(0, 0, size, size);
   }, []);
 
-  function scratch(event: PointerEvent<HTMLCanvasElement>) {
-    if (!drawing.current || revealed) return;
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!canvas || !context) return;
-    const bounds = canvas.getBoundingClientRect();
-    const ratio = canvas.width / bounds.width;
-    context.save();
-    context.globalCompositeOperation = "destination-out";
-    context.beginPath();
-    context.arc((event.clientX - bounds.left) * ratio, (event.clientY - bounds.top) * ratio, 18 * ratio, 0, Math.PI * 2);
-    context.fill();
-    context.restore();
-    scratchMoves.current += 1;
-    if (scratchMoves.current > 3) setRevealed(true);
-  }
-
-  function finish() {
-    const wasDrawing = drawing.current;
-    drawing.current = false;
-    if (wasDrawing || scratchMoves.current > 0) setRevealed(true);
-  }
-
   return <div className={`scratch-heart ${revealed ? "is-revealed" : ""}`}>
     <div><small>{label}</small><strong>{value}</strong></div>
     <canvas
       ref={canvasRef}
-      aria-label={`Scratch to reveal ${label}`}
-      onPointerDown={(event) => { drawing.current = true; event.currentTarget.setPointerCapture(event.pointerId); scratch(event); }}
-      onPointerMove={scratch}
-      onPointerUp={() => { drawing.current = false; setRevealed(true); }}
-      onPointerLeave={finish}
-      onPointerCancel={finish}
+      role="button"
+      tabIndex={0}
+      aria-label={`Reveal ${label}`}
+      onClick={() => setRevealed(true)}
+      onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setRevealed(true); }}
     />
   </div>;
 }
@@ -121,13 +95,13 @@ function SaveTheDate({ date }: { date: string }) {
   const month = new Intl.DateTimeFormat("en", { month: "short" }).format(weddingDate);
   return <section className="save-date-section reveal">
     <p className="kicker">Save the date</p>
-    <h2>Gently scratch to reveal<br />our wedding date</h2>
+    <h2>Gently tap to reveal<br />our wedding date</h2>
     <div className="scratch-hearts">
       <ScratchHeart label="Day" value={day} />
       <ScratchHeart label="Date" value={number} />
       <ScratchHeart label="Month" value={month} />
     </div>
-    <p className="scratch-note">Use your finger or mouse</p>
+    <p className="scratch-note">Tap each heart</p>
   </section>;
 }
 
@@ -241,17 +215,9 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       <div className="envelope-flash" aria-hidden />
     </div>}
     <div className="invitation-story" ref={story} aria-hidden={!opened}>
-      <section className="blessing-section">
-        <img src={ganeshBlessing.url} alt="Lord Ganesh blessing symbol" width={768} height={768} />
-        <span className="blessing-rule" aria-hidden />
-        <p>With love and blessings,</p>
-        <h1>we invite you to the wedding of</h1>
-        <h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2>
-        <small>Together with our families</small>
-      </section>
       <section className="invitation-cover arch-cover">
         <video ref={coverVideo} className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
-        <div className="arch-cover-copy"><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
+        <div className="arch-cover-copy"><img className="cover-ganesh" src={ganeshBlessing.url} alt="Lord Ganesh blessing symbol" width={768} height={768} /><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
       <SaveTheDate date={data.wedding.date} />
       <section className="portrait-panel reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
