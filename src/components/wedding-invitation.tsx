@@ -1,12 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { CalendarDays, Check, MapPin, Music2, Pause, Volume2 } from "lucide-react";
+import { CalendarDays, Check, MapPin, Music2, Pause, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import type { WeddingData } from "@/lib/wedding-data";
 import sacredHero from "@/assets/sacred-garden-hero.jpg";
 import royalHero from "@/assets/royal-celebration-hero.jpg";
 import detailPhoto from "@/assets/wedding-detail.jpg";
+import royalProcessional from "@/assets/royal-wedding-processional.wav.asset.json";
 
 function initials(data: WeddingData) {
   return `${data.couple.groom.charAt(0)}${data.couple.bride.charAt(0)}`;
@@ -31,20 +35,30 @@ function Countdown({ date }: { date: string }) {
   return <div className="countdown">{values.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div>;
 }
 
-function Rsvp({ invitationId }: { invitationId?: string }) {
+function Rsvp({ invitationId, couple }: { invitationId?: string; couple: WeddingData["couple"] }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [attending, setAttending] = useState("yes");
+  const [familySide, setFamilySide] = useState("bride");
+  const [partySize, setPartySize] = useState("1");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const guestName = String(form.get("name") ?? "").trim();
     if (!guestName || guestName.length > 100) { setError("Please enter your name."); return; }
+    const details = [
+      `Family: ${familySide === "bride" ? `${couple.bride}'s side` : `${couple.groom}'s side`}`,
+      `WhatsApp: ${String(form.get("whatsapp") ?? "").trim()}`,
+      `Song: ${String(form.get("song") ?? "").trim() || "Not provided"}`,
+      `Children: ${String(form.get("children") ?? "").trim() || "None listed"}`,
+      `Message: ${String(form.get("message") ?? "").trim() || "—"}`,
+    ].join("\n");
     const response = {
       guest_name: guestName,
-      attending: form.get("attending") === "yes",
-      party_size: Math.min(20, Math.max(1, Number(form.get("partySize") ?? 1))),
+      attending: attending === "yes",
+      party_size: Math.min(20, Math.max(1, Number(partySize))),
       dietary_requirements: String(form.get("dietary") ?? "").trim().slice(0, 500),
-      message: String(form.get("message") ?? "").trim().slice(0, 1000),
+      message: details.slice(0, 1000),
       website: String(form.get("website") ?? ""),
     };
     if (response.website) return;
@@ -54,34 +68,48 @@ function Rsvp({ invitationId }: { invitationId?: string }) {
     }
     setSent(true);
   }
-  if (sent) return <div className="rsvp-success"><Check aria-hidden /><p>Thank you. Your reply has been received.</p></div>;
-  return <form className="rsvp-form" onSubmit={submit}>
-    <input name="website" tabIndex={-1} autoComplete="off" className="honeypot" aria-hidden="true" />
-    <label>Your name<input name="name" maxLength={100} required /></label>
-    <fieldset><legend>Will you join us?</legend><label><input type="radio" name="attending" value="yes" defaultChecked /> Joyfully accepts</label><label><input type="radio" name="attending" value="no" /> Regretfully declines</label></fieldset>
-    <label>Number of guests<input name="partySize" type="number" min={1} max={20} defaultValue={1} /></label>
-    <label>Dietary requirements<textarea name="dietary" maxLength={500} rows={2} /></label>
-    <label>A note for the couple<textarea name="message" maxLength={1000} rows={3} /></label>
-    {error && <p className="form-error" role="alert">{error}</p>}
-    <Button type="submit" size="lg">Send our reply</Button>
-  </form>;
+  return <Dialog>
+    <DialogTrigger asChild><Button size="lg" className="rsvp-open">Open RSVP</Button></DialogTrigger>
+    <DialogContent className="rsvp-dialog">
+      {sent ? <div className="rsvp-success"><Check aria-hidden /><h3>Thank you</h3><p>Your reply has been received. We cannot wait to celebrate with you.</p></div> : <>
+        <DialogHeader className="rsvp-dialog-header"><span className="rsvp-crest" aria-hidden>❦</span><DialogTitle>Confirm Your Attendance</DialogTitle><DialogDescription>Kindly reply before 09 August</DialogDescription></DialogHeader>
+        <form className="rsvp-form" onSubmit={submit}>
+          <input name="website" tabIndex={-1} autoComplete="off" className="honeypot" aria-hidden="true" />
+          <label>Primary guest <span>*</span><input name="name" maxLength={100} required /></label>
+          <fieldset><legend>Representing family <span>*</span></legend><RadioGroup value={familySide} onValueChange={setFamilySide}><label><RadioGroupItem value="groom" />{couple.groom} — groom&apos;s side</label><label><RadioGroupItem value="bride" />{couple.bride} — bride&apos;s side</label></RadioGroup></fieldset>
+          <label>WhatsApp number <span>*</span><input name="whatsapp" type="tel" inputMode="tel" required /></label>
+          <fieldset><legend>Will you be attending?</legend><RadioGroup value={attending} onValueChange={setAttending}><label><RadioGroupItem value="yes" />Accepts with pleasure</label><label><RadioGroupItem value="no" />Declines with regret</label></RadioGroup></fieldset>
+          <label>Total guests attending <span>*</span><Select value={partySize} onValueChange={setPartySize}><SelectTrigger><SelectValue placeholder="Choose" /></SelectTrigger><SelectContent>{Array.from({ length: 10 }, (_, index) => <SelectItem key={index + 1} value={String(index + 1)}>{index + 1}</SelectItem>)}</SelectContent></Select></label>
+          <label>A song that gets you dancing<input name="song" maxLength={120} /></label>
+          <label>Children attending <small>Please include names and ages.</small><textarea name="children" maxLength={500} rows={2} /></label>
+          <label>Dietary requirements<textarea name="dietary" maxLength={500} rows={2} /></label>
+          <label>A note for the couple<textarea name="message" maxLength={500} rows={3} /></label>
+          {error && <p className="form-error" role="alert">{error}</p>}
+          <Button type="submit" size="lg">Send our reply</Button>
+        </form>
+      </>}
+    </DialogContent>
+  </Dialog>;
 }
 
 export function WeddingInvitation({ data, invitationId, preview = false }: { data: WeddingData; invitationId?: string; preview?: boolean }) {
   const [opened, setOpened] = useState(preview);
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
   const royal = data.template.templateId === "royal-celebration";
   const dateLabel = new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${data.wedding.date}T12:00:00`));
+  const audioSrc = data.music.url || royalProcessional.url;
   useEffect(() => { if (!playing) audio.current?.pause(); }, [playing]);
+  useEffect(() => { if (audio.current) audio.current.muted = muted; }, [muted]);
   async function open() {
     setOpened(true);
-    if (data.music.enabled && data.music.url && audio.current) {
+    if (audio.current) {
       try { await audio.current.play(); setPlaying(true); } catch { setPlaying(false); }
     }
   }
   return <main className={`invitation ${royal ? "royal" : "garden"} ${opened ? "is-open" : "is-closed"}`}>
-    {data.music.url && <audio ref={audio} src={data.music.url} loop />}
+    <audio ref={audio} src={audioSrc} loop preload="auto" />
     {!opened && <div className="envelope-gate">
       <div className="envelope" aria-hidden>
         <div className="envelope-flap" />
@@ -107,10 +135,9 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       <section className="photo-interlude"><img src={detailPhoto} alt="Wedding rings and olive bouquet" loading="lazy" width={1024} height={1024} /><blockquote>“And so the adventure begins.”</blockquote></section>
       {data.visibility['venue'] && <section className="venue-section"><MapPin aria-hidden /><p className="kicker">Venue</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">View location</a></Button></section>}
       <section className="details-section"><article><span className="gift-mark">✦</span><p className="kicker">Gift preference</p><p>{data.giftNote}</p></article><article><CalendarDays aria-hidden /><p className="kicker">Dress code</p><p>{data.dressCode}</p></article></section>
-      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Confirm your attendance</p><h2>Will you celebrate with us?</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp {...(invitationId ? { invitationId } : {})} /></section>}
+      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Confirm your attendance</p><h2>Will you celebrate with us?</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
       <footer><p>Hope to see you there!</p><div className="monogram">{initials(data)}</div><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><small>With love, always</small></footer>
     </div>
-    {opened && data.music.url && <Button className="music-control" size="icon" variant="outline" onClick={async () => { if (!audio.current) return; if (playing) audio.current.pause(); else await audio.current.play(); setPlaying(!playing); }} aria-label={playing ? "Pause music" : "Play music"}>{playing ? <Pause /> : <Music2 />}</Button>}
-    {opened && !data.music.url && <span className="sound-note" title="Music begins after opening"><Volume2 aria-hidden /></span>}
+    {opened && <div className="sound-controls" aria-label="Music controls"><Button size="icon" variant="outline" onClick={async () => { if (!audio.current) return; if (playing) audio.current.pause(); else await audio.current.play(); setPlaying(!playing); }} aria-label={playing ? "Pause music" : "Play music"}>{playing ? <Pause /> : <Music2 />}</Button><Button size="icon" variant="outline" onClick={() => setMuted((value) => !value)} aria-label={muted ? "Unmute music" : "Mute music"}>{muted ? <VolumeX /> : <Volume2 />}</Button></div>}
   </main>;
 }
