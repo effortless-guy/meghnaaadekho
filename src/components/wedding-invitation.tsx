@@ -10,6 +10,7 @@ import type { WeddingData } from "@/lib/wedding-data";
 import sacredHero from "@/assets/sacred-garden-hero.jpg";
 import royalHero from "@/assets/royal-celebration-hero.jpg";
 import detailPhoto from "@/assets/wedding-detail.jpg";
+import embossedBotanicals from "@/assets/embossed-envelope-botanicals.png";
 import royalProcessional from "@/assets/royal-wedding-processional.wav.asset.json";
 
 function initials(data: WeddingData) {
@@ -113,10 +114,7 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
     {!opened && <div className="envelope-gate">
       <div className="envelope" aria-hidden>
         <div className="envelope-flap" />
-        <div className="embossed-sprig sprig-top-left">❦</div>
-        <div className="embossed-sprig sprig-top-right">❦</div>
-        <div className="embossed-sprig sprig-bottom-left">❦</div>
-        <div className="embossed-sprig sprig-bottom-right">❦</div>
+        <img className="envelope-botanicals" src={embossedBotanicals} alt="" width={1024} height={1536} />
         <div className="envelope-prompt"><span>⌃</span>Tap to open</div>
       </div>
       <Button className="wax-seal" onClick={open} aria-label="Open invitation"><span>{initials(data)}</span></Button>
