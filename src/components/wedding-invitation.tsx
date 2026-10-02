@@ -29,7 +29,6 @@ function Rsvp({ invitationId }: { invitationId?: string }) {
     const guestName = String(form.get("name") ?? "").trim();
     if (!guestName || guestName.length > 100) { setError("Please enter your name."); return; }
     const response = {
-      invitation_id: invitationId,
       guest_name: guestName,
       attending: form.get("attending") === "yes",
       party_size: Math.min(20, Math.max(1, Number(form.get("partySize") ?? 1))),
@@ -39,7 +38,7 @@ function Rsvp({ invitationId }: { invitationId?: string }) {
     };
     if (response.website) return;
     if (invitationId) {
-      const { error: submitError } = await supabase.from("rsvp_responses").insert(response);
+      const { error: submitError } = await supabase.from("rsvp_responses").insert({ ...response, invitation_id: invitationId });
       if (submitError) { setError("We couldn't send your reply. Please try again."); return; }
     }
     setSent(true);
@@ -87,11 +86,11 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       {!royal && <section className="letter-section ornamented"><p className="kicker">A note from us</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
       <section className="countdown-section"><p className="kicker">Until we say I do</p><Countdown date={data.wedding.date} /></section>
-      {data.visibility.events && <section className="events-section"><p className="kicker">The celebration</p><h2>{royal ? "Wedding festivities" : "A weekend in the garden"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><p>{item.date} · {item.time}</p><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
+      {data.visibility['events'] && <section className="events-section"><p className="kicker">The celebration</p><h2>{royal ? "Wedding festivities" : "A weekend in the garden"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><p>{item.date} · {item.time}</p><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
       <section className="photo-interlude"><img src={detailPhoto} alt="Wedding rings and olive bouquet" loading="lazy" width={1024} height={1024} /><blockquote>“And so the adventure begins.”</blockquote></section>
-      {data.visibility.venue && <section className="venue-section"><MapPin aria-hidden /><p className="kicker">The place</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">View directions</a></Button></section>}
+      {data.visibility['venue'] && <section className="venue-section"><MapPin aria-hidden /><p className="kicker">The place</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">View directions</a></Button></section>}
       <section className="details-section"><article><CalendarDays aria-hidden /><p className="kicker">Dress</p><p>{data.dressCode}</p></article><article><span className="gift-mark">✦</span><p className="kicker">With love</p><p>{data.giftNote}</p></article></section>
-      {data.rsvp.enabled && data.visibility.rsvp && <section className="rsvp-section"><p className="kicker">Kindly reply</p><h2>Will you celebrate with us?</h2><p>Please respond by 14 January 2027.</p><Rsvp invitationId={invitationId} /></section>}
+      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section"><p className="kicker">Kindly reply</p><h2>Will you celebrate with us?</h2><p>Please respond by 14 January 2027.</p><Rsvp {...(invitationId ? { invitationId } : {})} /></section>}
       <footer><div className="monogram">{initials(data)}</div><p>{data.couple.groom} & {data.couple.bride}</p><small>Made with love</small></footer>
     </div>
     {opened && data.music.url && <Button className="music-control" size="icon" variant="outline" onClick={async () => { if (!audio.current) return; if (playing) audio.current.pause(); else await audio.current.play(); setPlaying(!playing); }} aria-label={playing ? "Pause music" : "Play music"}>{playing ? <Pause /> : <Music2 />}</Button>}
