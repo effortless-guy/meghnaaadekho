@@ -13,10 +13,21 @@ function initials(data: WeddingData) {
 }
 
 function Countdown({ date }: { date: string }) {
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
   const values = useMemo(() => {
-    const days = Math.max(0, Math.ceil((new Date(date).getTime() - Date.now()) / 86400000));
-    return [{ label: "Days", value: days }, { label: "Hours", value: "16" }, { label: "Minutes", value: "30" }];
-  }, [date]);
+    const remaining = Math.max(0, new Date(`${date}T16:30:00`).getTime() - now);
+    return [
+      { label: "Days", value: Math.floor(remaining / 86400000) },
+      { label: "Hours", value: String(Math.floor((remaining / 3600000) % 24)).padStart(2, "0") },
+      { label: "Minutes", value: String(Math.floor((remaining / 60000) % 60)).padStart(2, "0") },
+      { label: "Seconds", value: String(Math.floor((remaining / 1000) % 60)).padStart(2, "0") },
+    ];
+  }, [date, now]);
   return <div className="countdown">{values.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div>;
 }
 
@@ -72,26 +83,26 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   return <main className={`invitation ${royal ? "royal" : "garden"} ${opened ? "is-open" : "is-closed"}`}>
     {data.music.url && <audio ref={audio} src={data.music.url} loop />}
     {!opened && <div className="envelope-gate">
-      <div className="envelope" aria-hidden><div className="envelope-flap" /><div className="emboss emboss-left">❧</div><div className="emboss emboss-right">❧</div></div>
+      <div className="envelope" aria-hidden><div className="envelope-flap" /><div className="emboss emboss-left">❧</div><div className="emboss emboss-right">❧</div><div className="envelope-vine vine-left">⌇❧⌇</div><div className="envelope-vine vine-right">⌇❧⌇</div></div>
       <Button className="wax-seal" onClick={open} aria-label="Open invitation"><span>{initials(data)}</span></Button>
-      <p>Tap to open</p>
+      <p><span>⌃</span>Tap to open</p>
     </div>}
     <div className="invitation-story" aria-hidden={!opened}>
-      <section className="invitation-cover">
-        <img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} />
-        <div className="cover-shade" />
-        <div className="cover-copy"><p>{data.intro.headline}</p><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><time>{dateLabel}</time></div>
-        <span className="scroll-mark">Discover our celebration</span>
+      <section className="invitation-cover paper-panel">
+        <div className="botanical-crown" aria-hidden>❦</div>
+        <div className="cover-copy"><p>{data.intro.headline}</p><span className="cover-rule" /><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><small>The wedding of</small><time>{dateLabel}</time><p className="cover-time">At half past four in the afternoon</p></div>
+        <span className="scroll-mark">Scroll to discover</span>
       </section>
-      {!royal && <section className="letter-section ornamented"><p className="kicker">A note from us</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div></section>}
+      <section className="portrait-panel"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div></section>
+      {!royal && <section className="letter-section ornamented"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
-      <section className="countdown-section"><p className="kicker">Until we say I do</p><Countdown date={data.wedding.date} /></section>
-      {data.visibility['events'] && <section className="events-section"><p className="kicker">The celebration</p><h2>{royal ? "Wedding festivities" : "A weekend in the garden"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><span>{String(index + 1).padStart(2, "0")}</span><div><p>{item.date} · {item.time}</p><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
+      <section className="countdown-section"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
+      {data.visibility['events'] && <section className="events-section ornamented"><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
       <section className="photo-interlude"><img src={detailPhoto} alt="Wedding rings and olive bouquet" loading="lazy" width={1024} height={1024} /><blockquote>“And so the adventure begins.”</blockquote></section>
-      {data.visibility['venue'] && <section className="venue-section"><MapPin aria-hidden /><p className="kicker">The place</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">View directions</a></Button></section>}
-      <section className="details-section"><article><CalendarDays aria-hidden /><p className="kicker">Dress</p><p>{data.dressCode}</p></article><article><span className="gift-mark">✦</span><p className="kicker">With love</p><p>{data.giftNote}</p></article></section>
-      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section"><p className="kicker">Kindly reply</p><h2>Will you celebrate with us?</h2><p>Please respond by 14 January 2027.</p><Rsvp {...(invitationId ? { invitationId } : {})} /></section>}
-      <footer><div className="monogram">{initials(data)}</div><p>{data.couple.groom} & {data.couple.bride}</p><small>Made with love</small></footer>
+      {data.visibility['venue'] && <section className="venue-section"><MapPin aria-hidden /><p className="kicker">Venue</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">View location</a></Button></section>}
+      <section className="details-section"><article><span className="gift-mark">✦</span><p className="kicker">Gift preference</p><p>{data.giftNote}</p></article><article><CalendarDays aria-hidden /><p className="kicker">Dress code</p><p>{data.dressCode}</p></article></section>
+      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Confirm your attendance</p><h2>Will you celebrate with us?</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp {...(invitationId ? { invitationId } : {})} /></section>}
+      <footer><p>Hope to see you there!</p><div className="monogram">{initials(data)}</div><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><small>With love, always</small></footer>
     </div>
     {opened && data.music.url && <Button className="music-control" size="icon" variant="outline" onClick={async () => { if (!audio.current) return; if (playing) audio.current.pause(); else await audio.current.play(); setPlaying(!playing); }} aria-label={playing ? "Pause music" : "Play music"}>{playing ? <Pause /> : <Music2 />}</Button>}
     {opened && !data.music.url && <span className="sound-note" title="Music begins after opening"><Volume2 aria-hidden /></span>}
