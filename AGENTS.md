@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Wedding content lives in the shared `WeddingData` model; templates consume it and own independent visual composition, because new templates must not become palette swaps.
