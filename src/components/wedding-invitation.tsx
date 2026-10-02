@@ -113,6 +113,13 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   useEffect(() => { if (!playing) audio.current?.pause(); }, [playing]);
   useEffect(() => { if (audio.current) audio.current.muted = muted; }, [muted]);
   const story = useRef<HTMLDivElement>(null);
+  const coverVideo = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = coverVideo.current;
+    if (!video) return;
+    video.muted = true;
+    video.play().catch(() => undefined);
+  }, [opening]);
   useEffect(() => {
     if (!opened || !story.current) return;
     const targets = story.current.querySelectorAll<HTMLElement>(".reveal");
@@ -145,7 +152,7 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
     </div>}
     <div className="invitation-story" ref={story} aria-hidden={!opened}>
       <section className="invitation-cover arch-cover">
-        <video className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
+        <video ref={coverVideo} className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
         <div className="arch-cover-copy"><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
       <section className="portrait-panel reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
