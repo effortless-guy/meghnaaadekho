@@ -70,7 +70,7 @@ function Rsvp({ invitationId, couple }: { invitationId?: string; couple: Wedding
   }
   return <Dialog>
     <DialogTrigger asChild><Button size="lg" className="rsvp-open">Open RSVP</Button></DialogTrigger>
-    <DialogContent className="rsvp-dialog">
+    <DialogContent className="rsvp-dialog !left-0 !top-0 !translate-x-0 !translate-y-0">
       {sent ? <div className="rsvp-success"><Check aria-hidden /><h3>Thank you</h3><p>Your reply has been received. We cannot wait to celebrate with you.</p></div> : <>
         <DialogHeader className="rsvp-dialog-header"><span className="rsvp-crest" aria-hidden>❦</span><DialogTitle>Confirm Your Attendance</DialogTitle><DialogDescription>Kindly reply before 09 August</DialogDescription></DialogHeader>
         <form className="rsvp-form" onSubmit={submit}>
