@@ -165,7 +165,6 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
         <div className="envelope-sparkles" aria-hidden>{SPARKLES.map(([x, y, d], i) => <i key={i} style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` }} />)}</div>
         <button type="button" className="wax-seal" onClick={(event) => { event.stopPropagation(); open(); }} aria-label="Tap to open invitation"><img src={waxSeal.url} alt="" draggable={false} /><span>{initials(data)}</span></button>
       </div>
-      <p className="envelope-message">With love and blessings,<br />we invite you to the wedding of<br /><strong>{data.couple.groom} &amp; {data.couple.bride}</strong></p>
       <p className="envelope-prompt"><span aria-hidden>↑</span> Tap to open</p>
       <div className="envelope-flash" aria-hidden />
     </div>}
