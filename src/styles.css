@@ -255,7 +255,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .invitation-cover.arch-cover { padding: 0; border: 0; justify-content: flex-start; background: oklch(0.955 0.025 82); }
 .invitation-cover.arch-cover::before, .invitation-cover.arch-cover::after { display: none; }
 .invitation .invitation-story > .arch-cover > .arch-cover-art { position: absolute; z-index: 0; max-width: none; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); transition: transform 3.2s cubic-bezier(.2,.7,.2,1); }
-.is-open .arch-cover-art { transform: scale(1); }
+.invitation.is-open .invitation-story > .arch-cover > .arch-cover-art { transform: scale(1); }
 .arch-cover-copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding-top: 19svh; color: oklch(0.6 0.11 78); opacity: 0; transform: translateY(22px); transition: opacity 1.6s ease 1s, transform 1.6s ease 1s; text-shadow: 0 1px 12px oklch(0.99 0.01 85 / .8); }
 .is-open .arch-cover-copy { opacity: 1; transform: none; }
 .arch-script { font: 400 clamp(30px, 9vw, 38px)/1 "Pinyon Script", cursive; }
