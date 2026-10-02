@@ -17,3 +17,5 @@
 - [x] Replace decorative numeral styling with clean, readable numerals
 - [x] Redesign the final page as an image-free contact directory
 - [x] Add alternating flower reveals across each torn-paper page transition
+- [x] Add icon-led interactive styling to the maps and RSVP actions
+- [x] Add a conditional JSON-backed event-date page before the countdown

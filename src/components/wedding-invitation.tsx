@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { Check, Mail, MapPin, Phone, Volume2, VolumeX } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Check, HeartHandshake, Mail, MapPin, Phone, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -92,7 +92,7 @@ function Rsvp({ invitationId, couple }: { invitationId?: string; couple: Wedding
     setSent(true);
   }
   return <Dialog>
-    <DialogTrigger asChild><Button size="lg" className="rsvp-open">Open RSVP</Button></DialogTrigger>
+    <DialogTrigger asChild><Button size="lg" className="invitation-action rsvp-open"><HeartHandshake aria-hidden /><span>Open RSVP</span><ArrowUpRight className="action-arrow" aria-hidden /></Button></DialogTrigger>
     <DialogContent className="rsvp-dialog !left-0 !top-0 !translate-x-0 !translate-y-0">
       {sent ? <div className="rsvp-success"><Check aria-hidden /><h3>Thank you</h3><p>Your reply has been received. We cannot wait to celebrate with you.</p></div> : <>
         <DialogHeader className="rsvp-dialog-header"><span className="rsvp-crest" aria-hidden>❦</span><DialogTitle>Confirm Your Attendance</DialogTitle><DialogDescription>Kindly reply before 09 August</DialogDescription></DialogHeader>
@@ -123,6 +123,7 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   const [muted, setMuted] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
   const royal = data.template.templateId === "royal-celebration";
+  const datedEvents = data.events.filter((event) => event.date.trim().length > 0);
   const dateLabel = new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${data.wedding.date}T12:00:00`));
   const shortDate = data.wedding.date.split("-").reverse().map((part, index) => index === 2 ? part.slice(2) : part).join(".");
   const audioSrc = data.music.url || classicalTune.url;
@@ -176,9 +177,10 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       <section className="portrait-panel story-break reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div></section>
       {!royal && <section className="letter-section ornamented torn-sheet reveal"><FloralBreak flower="rose" side="left" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
-      <section className="countdown-section torn-sheet reveal"><FloralBreak flower="jasmine" side="right" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
+      {datedEvents.length > 0 && <section className="event-dates-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><CalendarDays className="event-dates-icon" aria-hidden /><p className="kicker">Mark your calendar</p><h2>Dates to remember</h2><div className="event-date-list">{datedEvents.map((item, index) => <article key={`${item.name}-${item.date}-${index}`}><span aria-hidden>{index % 2 === 0 ? "❦" : "✦"}</span><div><h3>{item.name}</h3><time>{item.date}</time></div></article>)}</div></section>}
+      <section className="countdown-section torn-sheet reveal"><FloralBreak flower="jasmine" side="left" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
       {data.visibility['events'] && <section className="events-section ornamented torn-sheet reveal"><FloralBreak flower="lotus" side="left" /><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
-      {data.visibility['venue'] && <section className="venue-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><img className="venue-art" src={venueGardenPalace} alt="Watercolor garden palace at the wedding location" loading="lazy" width={1024} height={1280} /><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">Open in maps</a></Button></section>}
+      {data.visibility['venue'] && <section className="venue-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><img className="venue-art" src={venueGardenPalace} alt="Watercolor garden palace at the wedding location" loading="lazy" width={1024} height={1280} /><Button asChild variant="outline" className="invitation-action map-action"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer"><MapPin aria-hidden /><span>Open in maps</span><ArrowUpRight className="action-arrow" aria-hidden /></a></Button></section>}
       {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section torn-sheet reveal"><FloralBreak flower="rose" side="left" /><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
       <footer className="story-break reveal"><FloralBreak flower="jasmine" side="right" /><div className="footer-ornament" aria-hidden>❦</div><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><span className="footer-rule" /><p className="contact-intro">For any questions, please contact</p><div className="contact-list" aria-label="Contact the wedding party">{data.contacts.map((contact) => <div className="contact-person" key={`${contact.name}-${contact.phone}`}><span className="contact-initial" aria-hidden>{contact.name.charAt(0)}</span><div className="contact-details"><strong>{contact.name}</strong><a href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}><Phone aria-hidden /><span>{contact.phone}</span></a>{contact.email && <a href={`mailto:${contact.email}`}><Mail aria-hidden /><span>{contact.email}</span></a>}</div></div>)}</div><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
     </div>
