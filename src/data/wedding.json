@@ -50,7 +50,12 @@
   "contacts": [
     {
       "name": "Anika",
-      "phone": "+91 90000 00000"
+      "phone": "+91 98765 43210",
+      "email": "wedding@example.com"
+    },
+    {
+      "name": "Arjun",
+      "phone": "+91 91234 56789"
     }
   ],
   "music": {

@@ -21,7 +21,7 @@ export interface WeddingData {
   gallery: string[];
   dressCode: string;
   giftNote: string;
-  contacts: { name: string; phone: string }[];
+  contacts: { name: string; phone: string; email?: string }[];
   music: { enabled: boolean; url: string };
   rsvp: { enabled: boolean; questions: string[] };
   template: { templateId: TemplateId };

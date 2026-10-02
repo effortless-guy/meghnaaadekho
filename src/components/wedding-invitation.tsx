@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { Check, MapPin, Volume2, VolumeX } from "lucide-react";
+import { Check, Mail, MapPin, Phone, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import type { WeddingData } from "@/lib/wedding-data";
 import sacredHero from "@/assets/sacred-garden-hero.jpg";
 import royalHero from "@/assets/royal-celebration-hero.jpg";
-import detailPhoto from "@/assets/wedding-detail.jpg";
 import envelopePaper from "@/assets/envelope-paper.jpg.asset.json";
 import waxSeal from "@/assets/wax-seal.png.asset.json";
 import classicalTune from "@/assets/classical-canon.mp3.asset.json";
@@ -42,67 +41,6 @@ function Countdown({ date }: { date: string }) {
     ];
   }, [date, now]);
   return <div className="countdown">{values.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div>;
-}
-
-function ScratchHeart({ label, value }: { label: string; value: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ratio = window.devicePixelRatio || 1;
-    const size = canvas.getBoundingClientRect().width;
-    canvas.width = size * ratio;
-    canvas.height = size * ratio;
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    context.scale(ratio, ratio);
-    context.fillStyle = "#d6b75f";
-    context.beginPath();
-    context.moveTo(size / 2, size * .86);
-    context.bezierCurveTo(size * .42, size * .72, size * .08, size * .54, size * .1, size * .29);
-    context.bezierCurveTo(size * .12, size * .05, size * .4, size * .02, size / 2, size * .22);
-    context.bezierCurveTo(size * .6, size * .02, size * .88, size * .05, size * .9, size * .29);
-    context.bezierCurveTo(size * .92, size * .54, size * .58, size * .72, size / 2, size * .86);
-    context.fill();
-    context.globalCompositeOperation = "source-atop";
-    const sheen = context.createLinearGradient(0, 0, size, size);
-    sheen.addColorStop(0, "rgba(255,255,255,.6)");
-    sheen.addColorStop(.4, "rgba(255,255,255,0)");
-    sheen.addColorStop(1, "rgba(117,70,20,.22)");
-    context.fillStyle = sheen;
-    context.fillRect(0, 0, size, size);
-  }, []);
-
-  return <div className={`scratch-heart ${revealed ? "is-revealed" : ""}`}>
-    <div><small>{label}</small><strong>{value}</strong></div>
-    <canvas
-      ref={canvasRef}
-      role="button"
-      tabIndex={0}
-      aria-label={`Reveal ${label}`}
-      onClick={() => setRevealed(true)}
-      onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setRevealed(true); }}
-    />
-  </div>;
-}
-
-function SaveTheDate({ date }: { date: string }) {
-  const weddingDate = new Date(`${date}T12:00:00`);
-  const day = new Intl.DateTimeFormat("en", { weekday: "short" }).format(weddingDate);
-  const number = new Intl.DateTimeFormat("en", { day: "numeric" }).format(weddingDate);
-  const month = new Intl.DateTimeFormat("en", { month: "short" }).format(weddingDate);
-  return <section className="save-date-section reveal">
-    <p className="kicker">Save the date</p>
-    <h2>Gently tap to reveal<br />our wedding date</h2>
-    <div className="scratch-hearts">
-      <ScratchHeart label="Day" value={day} />
-      <ScratchHeart label="Date" value={number} />
-      <ScratchHeart label="Month" value={month} />
-    </div>
-    <p className="scratch-note">Tap each heart</p>
-  </section>;
 }
 
 function Rsvp({ invitationId, couple }: { invitationId?: string; couple: WeddingData["couple"] }) {
@@ -220,16 +158,14 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
         <video ref={coverVideo} className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
         <div className="arch-cover-copy"><img className="cover-ganesh" src={ganeshBlessing.url} alt="Lord Ganesh blessing symbol" width={768} height={768} /><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
-      <SaveTheDate date={data.wedding.date} />
       <section className="portrait-panel story-break reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
       {!royal && <section className="letter-section ornamented torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
       <section className="countdown-section torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
       {data.visibility['events'] && <section className="events-section ornamented torn-sheet reveal"><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
-      <section className="photo-interlude story-break reveal"><img src={detailPhoto} alt="Wedding rings and olive bouquet" loading="lazy" width={1024} height={1024} /><blockquote>“And so the adventure begins.”</blockquote></section>
       {data.visibility['venue'] && <section className="venue-section torn-sheet reveal"><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><img className="venue-art" src={venueGardenPalace} alt="Watercolor garden palace at the wedding location" loading="lazy" width={1024} height={1280} /><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">Open in maps</a></Button></section>}
       {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
-      <footer className="story-break reveal"><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><img src={sacredHero} alt={`${data.couple.groom} and ${data.couple.bride}`} loading="lazy" width={1024} height={1536} /><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
+      <footer className="story-break reveal"><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><div className="contact-list" aria-label="Contact the wedding party">{data.contacts.map((contact) => <div className="contact-person" key={`${contact.name}-${contact.phone}`}><span>{contact.name}</span><a href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}><Phone aria-hidden />{contact.phone}</a>{contact.email && <a href={`mailto:${contact.email}`}><Mail aria-hidden />{contact.email}</a>}</div>)}</div><img src={sacredHero} alt={`${data.couple.groom} and ${data.couple.bride}`} loading="lazy" width={1024} height={1536} /><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
     </div>
     <div className="sound-controls" aria-label="Music"><Button size="icon" variant="outline" onClick={toggleMusic} aria-pressed={playing} aria-label={playing ? "Turn music off" : "Turn music on"}>{playing ? <Volume2 /> : <VolumeX />}</Button></div>
   </main>;
