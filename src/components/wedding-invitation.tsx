@@ -95,8 +95,9 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
   }
 
   function finish() {
+    const wasDrawing = drawing.current;
     drawing.current = false;
-    if (scratchMoves.current > 0) setRevealed(true);
+    if (wasDrawing || scratchMoves.current > 0) setRevealed(true);
   }
 
   return <div className={`scratch-heart ${revealed ? "is-revealed" : ""}`}>
@@ -106,7 +107,7 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
       aria-label={`Scratch to reveal ${label}`}
       onPointerDown={(event) => { drawing.current = true; event.currentTarget.setPointerCapture(event.pointerId); scratch(event); }}
       onPointerMove={scratch}
-      onPointerUp={finish}
+      onPointerUp={() => { drawing.current = false; setRevealed(true); }}
       onPointerLeave={finish}
       onPointerCancel={finish}
     />
