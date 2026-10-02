@@ -241,17 +241,9 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       <div className="envelope-flash" aria-hidden />
     </div>}
     <div className="invitation-story" ref={story} aria-hidden={!opened}>
-      <section className="blessing-section">
-        <img src={ganeshBlessing.url} alt="Lord Ganesh blessing symbol" width={768} height={768} />
-        <span className="blessing-rule" aria-hidden />
-        <p>With love and blessings,</p>
-        <h1>we invite you to the wedding of</h1>
-        <h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2>
-        <small>Together with our families</small>
-      </section>
       <section className="invitation-cover arch-cover">
         <video ref={coverVideo} className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
-        <div className="arch-cover-copy"><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
+        <div className="arch-cover-copy"><img className="cover-ganesh" src={ganeshBlessing.url} alt="Lord Ganesh blessing symbol" width={768} height={768} /><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
       <SaveTheDate date={data.wedding.date} />
       <section className="portrait-panel reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
