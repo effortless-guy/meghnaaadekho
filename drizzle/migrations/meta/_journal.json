@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790928921372,
+      "tag": "0000_create_wedding_invitations_and_rsvps",
+      "breakpoints": true
+    }
+  ]
 }

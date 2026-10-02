@@ -14,7 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      rsvp_responses: {
+        Row: {
+          attending: boolean
+          created_at: string
+          dietary_requirements: string
+          guest_name: string
+          id: string
+          invitation_id: string
+          message: string
+          party_size: number
+          website: string
+        }
+        Insert: {
+          attending: boolean
+          created_at?: string
+          dietary_requirements?: string
+          guest_name: string
+          id?: string
+          invitation_id: string
+          message?: string
+          party_size?: number
+          website?: string
+        }
+        Update: {
+          attending?: boolean
+          created_at?: string
+          dietary_requirements?: string
+          guest_name?: string
+          id?: string
+          invitation_id?: string
+          message?: string
+          party_size?: number
+          website?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rsvp_responses_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "wedding_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wedding_invitations: {
+        Row: {
+          created_at: string
+          id: string
+          owner_id: string
+          slug: string
+          status: string
+          template_id: string
+          updated_at: string
+          wedding_data: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          owner_id: string
+          slug: string
+          status?: string
+          template_id?: string
+          updated_at?: string
+          wedding_data?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          owner_id?: string
+          slug?: string
+          status?: string
+          template_id?: string
+          updated_at?: string
+          wedding_data?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
