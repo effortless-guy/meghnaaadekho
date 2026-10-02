@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent } from "react";
 import { Check, MapPin, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ function Countdown({ date }: { date: string }) {
 function ScratchHeart({ label, value }: { label: string; value: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drawing = useRef(false);
+  const scratchMoves = useRef(0);
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -76,7 +77,7 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
     context.fillRect(0, 0, size, size);
   }, []);
 
-  function scratch(event: React.PointerEvent<HTMLCanvasElement>) {
+  function scratch(event: PointerEvent<HTMLCanvasElement>) {
     if (!drawing.current || revealed) return;
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
@@ -89,17 +90,12 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
     context.arc((event.clientX - bounds.left) * ratio, (event.clientY - bounds.top) * ratio, 18 * ratio, 0, Math.PI * 2);
     context.fill();
     context.restore();
+    scratchMoves.current += 1;
   }
 
   function finish() {
     drawing.current = false;
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!canvas || !context) return;
-    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    let clear = 0;
-    for (let index = 3; index < pixels.length; index += 64) if (pixels[index] < 40) clear += 1;
-    if (clear / (pixels.length / 64) > .58) setRevealed(true);
+    if (scratchMoves.current > 14) setRevealed(true);
   }
 
   return <div className={`scratch-heart ${revealed ? "is-revealed" : ""}`}>
