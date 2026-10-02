@@ -14,3 +14,5 @@
 - [x] Make the full invitation edge-to-edge across phone widths
 - [x] Improve numeric typography and schedule time legibility
 - [x] Add JSON-backed contact details to the final page
+- [x] Replace decorative numeral styling with clean, readable numerals
+- [x] Redesign the final page as an image-free contact directory
