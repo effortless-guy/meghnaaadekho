@@ -13,8 +13,9 @@ function initials(data: WeddingData) {
 }
 
 function Countdown({ date }: { date: string }) {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(0);
   useEffect(() => {
+    setNow(Date.now());
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
