@@ -360,6 +360,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @keyframes prompt-lift { 50% { translate: 0 -5px; } }
 
 .blessing-section { min-height: 100svh; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 68px 30px; text-align: center; color: oklch(0.94 0.025 78); background-color: var(--burgundy); background-image: radial-gradient(circle at 50% 36%, color-mix(in oklab, var(--terracotta) 32%, transparent), transparent 46%), repeating-linear-gradient(102deg, transparent 0 4px, color-mix(in oklab, var(--primary-foreground) 2.5%, transparent) 4px 5px); }
+.invitation-story > .blessing-section::after, .invitation-story > .save-date-section::after { display: none; }
 .blessing-section::before { content: ""; position: absolute; inset: 15px; border: 1px solid color-mix(in oklab, var(--gold) 36%, transparent); pointer-events: none; }
 .blessing-section img { width: 118px; height: 118px; object-fit: contain; margin-bottom: 26px; filter: sepia(.35) brightness(1.7) drop-shadow(0 5px 16px color-mix(in oklab, var(--foreground) 24%, transparent)); }
 .blessing-rule { width: 46px; height: 1px; margin-bottom: 28px; background: var(--gold); opacity: .75; }
