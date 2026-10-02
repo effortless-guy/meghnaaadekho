@@ -17,6 +17,10 @@ import archLoopWebm from "@/assets/arch-swan-loop.webm.asset.json";
 import archPoster from "@/assets/arch-swan-poster.jpg.asset.json";
 import ganeshBlessing from "@/assets/ganesh-blessing.png.asset.json";
 import venueGardenPalace from "@/assets/venue-garden-palace.jpg";
+import transitionRose from "@/assets/transition-rose-left.png";
+import transitionJasmine from "@/assets/transition-jasmine-right.png";
+import transitionLotus from "@/assets/transition-lotus-left.png";
+import transitionMarigold from "@/assets/transition-marigold-right.png";
 
 const SPARKLES: [number, number, number][] = [[22, 18, 0], [74, 14, .35], [15, 42, .7], [84, 38, .2], [30, 62, .9], [70, 66, .5], [18, 84, 1.1], [80, 86, .8], [48, 30, 1.3], [52, 76, 1.5], [36, 50, 1.7], [64, 46, 1.9]];
 
@@ -41,6 +45,17 @@ function Countdown({ date }: { date: string }) {
     ];
   }, [date, now]);
   return <div className="countdown">{values.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div>;
+}
+
+const transitionFlowers = {
+  rose: transitionRose,
+  jasmine: transitionJasmine,
+  lotus: transitionLotus,
+  marigold: transitionMarigold,
+};
+
+function FloralBreak({ flower, side }: { flower: keyof typeof transitionFlowers; side: "left" | "right" }) {
+  return <img className={`page-flower page-flower-${side}`} src={transitionFlowers[flower]} alt="" loading="lazy" width={816} height={816} aria-hidden />;
 }
 
 function Rsvp({ invitationId, couple }: { invitationId?: string; couple: WeddingData["couple"] }) {
@@ -158,14 +173,14 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
         <video ref={coverVideo} className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
         <div className="arch-cover-copy"><img className="cover-ganesh" src={ganeshBlessing.url} alt="Lord Ganesh blessing symbol" width={768} height={768} /><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
-      <section className="portrait-panel story-break reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
-      {!royal && <section className="letter-section ornamented torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
+      <section className="portrait-panel story-break reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div></section>
+      {!royal && <section className="letter-section ornamented torn-sheet reveal"><FloralBreak flower="rose" side="left" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
-      <section className="countdown-section torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
-      {data.visibility['events'] && <section className="events-section ornamented torn-sheet reveal"><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
-      {data.visibility['venue'] && <section className="venue-section torn-sheet reveal"><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><img className="venue-art" src={venueGardenPalace} alt="Watercolor garden palace at the wedding location" loading="lazy" width={1024} height={1280} /><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">Open in maps</a></Button></section>}
-      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
-      <footer className="story-break reveal"><div className="footer-ornament" aria-hidden>❦</div><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><span className="footer-rule" /><p className="contact-intro">For any questions, please contact</p><div className="contact-list" aria-label="Contact the wedding party">{data.contacts.map((contact) => <div className="contact-person" key={`${contact.name}-${contact.phone}`}><span className="contact-initial" aria-hidden>{contact.name.charAt(0)}</span><div className="contact-details"><strong>{contact.name}</strong><a href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}><Phone aria-hidden /><span>{contact.phone}</span></a>{contact.email && <a href={`mailto:${contact.email}`}><Mail aria-hidden /><span>{contact.email}</span></a>}</div></div>)}</div><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
+      <section className="countdown-section torn-sheet reveal"><FloralBreak flower="jasmine" side="right" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
+      {data.visibility['events'] && <section className="events-section ornamented torn-sheet reveal"><FloralBreak flower="lotus" side="left" /><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
+      {data.visibility['venue'] && <section className="venue-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><img className="venue-art" src={venueGardenPalace} alt="Watercolor garden palace at the wedding location" loading="lazy" width={1024} height={1280} /><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">Open in maps</a></Button></section>}
+      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section torn-sheet reveal"><FloralBreak flower="rose" side="left" /><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
+      <footer className="story-break reveal"><FloralBreak flower="jasmine" side="right" /><div className="footer-ornament" aria-hidden>❦</div><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><span className="footer-rule" /><p className="contact-intro">For any questions, please contact</p><div className="contact-list" aria-label="Contact the wedding party">{data.contacts.map((contact) => <div className="contact-person" key={`${contact.name}-${contact.phone}`}><span className="contact-initial" aria-hidden>{contact.name.charAt(0)}</span><div className="contact-details"><strong>{contact.name}</strong><a href={`tel:${contact.phone.replace(/[^+\d]/g, "")}`}><Phone aria-hidden /><span>{contact.phone}</span></a>{contact.email && <a href={`mailto:${contact.email}`}><Mail aria-hidden /><span>{contact.email}</span></a>}</div></div>)}</div><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
     </div>
     <div className="sound-controls" aria-label="Music"><Button size="icon" variant="outline" onClick={toggleMusic} aria-pressed={playing} aria-label={playing ? "Turn music off" : "Turn music on"}>{playing ? <Volume2 /> : <VolumeX />}</Button></div>
   </main>;

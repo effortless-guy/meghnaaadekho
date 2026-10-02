@@ -389,6 +389,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .venue-section { padding-bottom: 72px; }
 .venue-art { width: calc(100% + 18px); max-height: 360px; margin: 0 -9px 30px; object-fit: cover; object-position: center 42%; border-block: 1px solid color-mix(in oklab, var(--invite-metal) 30%, transparent); mask-image: linear-gradient(to bottom, transparent, black 9%, black 91%, transparent); }
 .story-break { margin-top: -20px; clip-path: polygon(0 2%, 4% .6%, 9% 2%, 14% .8%, 20% 2.3%, 26% .5%, 32% 2%, 38% .7%, 44% 2.4%, 50% .6%, 56% 2.1%, 62% .8%, 68% 2.4%, 74% .5%, 80% 2.2%, 86% .8%, 92% 2.3%, 97% .7%, 100% 1.8%, 100% 100%, 0 100%); }
+.page-flower { position: absolute !important; z-index: 3 !important; top: -40px; width: 152px; height: 152px; object-fit: contain; pointer-events: none; opacity: 0; filter: drop-shadow(0 5px 7px color-mix(in oklab, var(--foreground) 13%, transparent)); transition: opacity 1.35s ease .15s, transform 1.8s cubic-bezier(.2,.75,.2,1) .15s !important; }
+.page-flower-left { left: -48px; object-position: left center; transform: translateX(-58px) rotate(-9deg) scale(.82) !important; transform-origin: left center; }
+.page-flower-right { right: -48px; object-position: right center; transform: translateX(58px) rotate(9deg) scale(.82) !important; transform-origin: right center; }
+.invitation .reveal.is-visible > .page-flower { opacity: .94; transform: translateX(0) rotate(0) scale(1) !important; transition-delay: .12s !important; }
+.countdown-section .page-flower { top: -32px; width: 142px; height: 142px; }
+.events-section .page-flower { top: -44px; width: 160px; height: 160px; }
+.venue-section .page-flower { top: -42px; width: 154px; height: 154px; }
+.rsvp-section .page-flower, .invitation footer .page-flower { top: -38px; width: 148px; height: 148px; }
 
 .invitation .reveal { opacity: 0; transform: scale(1.018); filter: blur(5px); transition: opacity 1.6s cubic-bezier(.22,.61,.36,1), transform 2s cubic-bezier(.22,.61,.36,1), filter 1.5s ease; }
 .invitation .reveal > *:not(.floral-edge) { opacity: 0; transform: scale(.985); transition: opacity 1.35s ease, transform 1.7s cubic-bezier(.22,.61,.36,1); }
@@ -407,4 +415,5 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .envelope-prompt span { animation: none; }
   .invitation .reveal, .invitation .reveal > *:not(.floral-edge) { opacity: 1; transform: none; filter: none; transition: none; }
+  .page-flower { opacity: .94; transform: none !important; transition: none !important; }
 }
