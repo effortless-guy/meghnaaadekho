@@ -261,7 +261,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .arch-script { font: 400 clamp(30px, 9vw, 38px)/1 "Pinyon Script", cursive; }
 .arch-cover-copy time { font: 400 clamp(22px, 6.6vw, 27px)/1.4 Marcellus, serif; letter-spacing: .04em; }
 .arch-cover-copy h1 { display: grid; margin-top: 7svh; font: 400 clamp(64px, 19vw, 82px)/.95 "Pinyon Script", cursive; }
-.arch-cover-copy h1 i { font-style: normal; font-size: .5em; line-height: 1; }
+.arch-cover-copy h1 i { font-style: normal; font-size: .62em; line-height: 1; }
 .arch-scroll { margin-top: 6svh; font-size: clamp(24px, 7vw, 30px); }
 .arch-chevron { width: 14px; height: 14px; margin-top: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); animation: chevron-bob 2s ease-in-out infinite; }
 @keyframes chevron-bob { 50% { translate: 0 6px; } }
