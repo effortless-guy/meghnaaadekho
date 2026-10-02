@@ -95,7 +95,7 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
 
   function finish() {
     drawing.current = false;
-    if (scratchMoves.current > 4) setRevealed(true);
+    if (scratchMoves.current > 0) setRevealed(true);
   }
 
   return <div className={`scratch-heart ${revealed ? "is-revealed" : ""}`}>
