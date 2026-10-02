@@ -1,0 +1,54 @@
+export type TemplateId = "sacred-garden" | "royal-celebration";
+
+export interface WeddingEvent {
+  name: string;
+  date: string;
+  time: string;
+  venue: string;
+  address: string;
+  description: string;
+}
+
+export interface WeddingData {
+  couple: { bride: string; groom: string };
+  wedding: { date: string; time: string; timezone: string };
+  intro: { headline: string; message: string };
+  story: string;
+  events: WeddingEvent[];
+  venue: { name: string; address: string; mapUrl: string };
+  gallery: string[];
+  dressCode: string;
+  giftNote: string;
+  contacts: { name: string; phone: string }[];
+  music: { enabled: boolean; url: string };
+  rsvp: { enabled: boolean; questions: string[] };
+  template: { templateId: TemplateId };
+  visibility: Record<string, boolean>;
+  publishing: { status: "draft" | "published" | "unpublished"; slug: string };
+}
+
+export const sampleWedding: WeddingData = {
+  couple: { bride: "Priya", groom: "Rahul" },
+  wedding: { date: "2027-02-14", time: "16:30", timezone: "Asia/Kolkata" },
+  intro: {
+    headline: "Together, with our families",
+    message: "We invite you to share in the joy of our wedding celebration.",
+  },
+  story:
+    "From a chance meeting to a lifetime of choosing each other, our story has been shaped by laughter, patience, and the people we love most.",
+  events: [
+    { name: "Welcome dinner", date: "13 February", time: "7:00 PM", venue: "The Courtyard", address: "Lake Palace Road", description: "An evening of music, stories, and old friends." },
+    { name: "The ceremony", date: "14 February", time: "4:30 PM", venue: "The Sacred Garden", address: "Udaipur, Rajasthan", description: "Vows beneath the garden arches, followed by cocktails." },
+    { name: "Dinner & dancing", date: "14 February", time: "7:30 PM", venue: "The Moon Pavilion", address: "Udaipur, Rajasthan", description: "Dinner beneath the stars and dancing until late." },
+  ],
+  venue: { name: "The Sacred Garden", address: "Lake Palace Road, Udaipur, Rajasthan", mapUrl: "https://maps.google.com/?q=Udaipur+Rajasthan" },
+  gallery: [],
+  dressCode: "Garden formal · jewel tones and soft pastels",
+  giftNote: "Your presence is our greatest gift. If you wish, a contribution to our new chapter would be warmly received.",
+  contacts: [{ name: "Anika", phone: "+91 90000 00000" }],
+  music: { enabled: false, url: "" },
+  rsvp: { enabled: true, questions: ["attendance", "partySize", "dietary", "message"] },
+  template: { templateId: "sacred-garden" },
+  visibility: { story: true, events: true, venue: true, dressCode: true, giftNote: true, rsvp: true },
+  publishing: { status: "published", slug: "rahul-and-priya" },
+};
