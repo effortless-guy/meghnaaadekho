@@ -95,29 +95,35 @@ function Rsvp({ invitationId, couple }: { invitationId?: string; couple: Wedding
 
 export function WeddingInvitation({ data, invitationId, preview = false }: { data: WeddingData; invitationId?: string; preview?: boolean }) {
   const [opened, setOpened] = useState(false);
+  const [opening, setOpening] = useState(false);
+  const [gateGone, setGateGone] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
   const royal = data.template.templateId === "royal-celebration";
   const dateLabel = new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${data.wedding.date}T12:00:00`));
+  const shortDate = data.wedding.date.split("-").reverse().map((part, index) => index === 2 ? part.slice(2) : part).join(".");
   const audioSrc = data.music.url || royalProcessional.url;
   useEffect(() => { if (!playing) audio.current?.pause(); }, [playing]);
   useEffect(() => { if (audio.current) audio.current.muted = muted; }, [muted]);
   async function open() {
-    setOpened(true);
+    if (opening) return;
+    setOpening(true);
+    window.setTimeout(() => setOpened(true), 2300);
+    window.setTimeout(() => setGateGone(true), 3400);
     if (audio.current) {
       try { await audio.current.play(); setPlaying(true); } catch { setPlaying(false); }
     }
   }
   return <main className={`invitation ${royal ? "royal" : "garden"} ${preview ? "is-preview" : ""} ${opened ? "is-open" : "is-closed"}`}>
     <audio ref={audio} src={audioSrc} loop preload="auto" />
-    {!opened && <div className="envelope-gate">
-      <div className="envelope" aria-hidden>
-        <div className="envelope-flap" />
-        <img className="envelope-botanicals" src={embossedBotanicals} alt="" width={1024} height={1536} />
-        <div className="envelope-prompt"><span>⌃</span>Tap to open</div>
+    {!gateGone && <div className={`envelope-gate ${opening ? "is-opening" : ""} ${opened ? "is-leaving" : ""}`}>
+      <div className="envelope" onClick={open} style={{ "--env-paper": `url(${envelopePaper.url})` } as CSSProperties}>
+        <div className="envelope-letter" aria-hidden><small>The wedding of</small><strong>{data.couple.groom}<i>&</i>{data.couple.bride}</strong><time>{shortDate}</time></div>
+        {(["left", "right", "bottom", "top"] as const).map((side) => <div key={side} className={`env-flap env-flap-${side}`} aria-hidden><div className="env-face env-front" /><div className="env-face env-back" /></div>)}
+        <div className="envelope-shine" aria-hidden />
+        <button type="button" className="wax-seal" onClick={(event) => { event.stopPropagation(); open(); }} aria-label="Tap to open invitation"><img src={waxSeal.url} alt="" draggable={false} /><span>{initials(data)}</span></button>
       </div>
-      <Button className="wax-seal" onClick={open} aria-label="Open invitation"><span>{initials(data)}</span></Button>
     </div>}
     <div className="invitation-story" aria-hidden={!opened}>
       <section className="invitation-cover paper-panel">
