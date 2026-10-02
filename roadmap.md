@@ -9,4 +9,4 @@
 - [x] Add the Ganesh blessing and interactive scratch-to-reveal date pages
 - [x] Remove dress code and gift preference pages
 - [x] Add illustrated location treatment
-- [ ] Replace slide-like section motion with smooth fades and verify mobile interactions
+- [x] Replace slide-like section motion with smooth fades and verify mobile interactions
