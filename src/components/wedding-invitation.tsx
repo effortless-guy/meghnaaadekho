@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { Check, MapPin, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,8 +46,6 @@ function Countdown({ date }: { date: string }) {
 
 function ScratchHeart({ label, value }: { label: string; value: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const drawing = useRef(false);
-  const scratchMoves = useRef(0);
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -77,39 +75,15 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
     context.fillRect(0, 0, size, size);
   }, []);
 
-  function scratch(event: PointerEvent<HTMLCanvasElement>) {
-    if (!drawing.current || revealed) return;
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!canvas || !context) return;
-    const bounds = canvas.getBoundingClientRect();
-    const ratio = canvas.width / bounds.width;
-    context.save();
-    context.globalCompositeOperation = "destination-out";
-    context.beginPath();
-    context.arc((event.clientX - bounds.left) * ratio, (event.clientY - bounds.top) * ratio, 18 * ratio, 0, Math.PI * 2);
-    context.fill();
-    context.restore();
-    scratchMoves.current += 1;
-    if (scratchMoves.current > 3) setRevealed(true);
-  }
-
-  function finish() {
-    const wasDrawing = drawing.current;
-    drawing.current = false;
-    if (wasDrawing || scratchMoves.current > 0) setRevealed(true);
-  }
-
   return <div className={`scratch-heart ${revealed ? "is-revealed" : ""}`}>
     <div><small>{label}</small><strong>{value}</strong></div>
     <canvas
       ref={canvasRef}
-      aria-label={`Scratch to reveal ${label}`}
-      onPointerDown={(event) => { drawing.current = true; event.currentTarget.setPointerCapture(event.pointerId); scratch(event); }}
-      onPointerMove={scratch}
-      onPointerUp={() => { drawing.current = false; setRevealed(true); }}
-      onPointerLeave={finish}
-      onPointerCancel={finish}
+      role="button"
+      tabIndex={0}
+      aria-label={`Reveal ${label}`}
+      onClick={() => setRevealed(true)}
+      onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setRevealed(true); }}
     />
   </div>;
 }
@@ -121,13 +95,13 @@ function SaveTheDate({ date }: { date: string }) {
   const month = new Intl.DateTimeFormat("en", { month: "short" }).format(weddingDate);
   return <section className="save-date-section reveal">
     <p className="kicker">Save the date</p>
-    <h2>Gently scratch to reveal<br />our wedding date</h2>
+    <h2>Gently tap to reveal<br />our wedding date</h2>
     <div className="scratch-hearts">
       <ScratchHeart label="Day" value={day} />
       <ScratchHeart label="Date" value={number} />
       <ScratchHeart label="Month" value={month} />
     </div>
-    <p className="scratch-note">Use your finger or mouse</p>
+    <p className="scratch-note">Tap each heart</p>
   </section>;
 }
 
