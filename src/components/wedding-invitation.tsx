@@ -83,9 +83,15 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   return <main className={`invitation ${royal ? "royal" : "garden"} ${opened ? "is-open" : "is-closed"}`}>
     {data.music.url && <audio ref={audio} src={data.music.url} loop />}
     {!opened && <div className="envelope-gate">
-      <div className="envelope" aria-hidden><div className="envelope-flap" /><div className="emboss emboss-left">❧</div><div className="emboss emboss-right">❧</div><div className="envelope-vine vine-left">⌇❧⌇</div><div className="envelope-vine vine-right">⌇❧⌇</div></div>
+      <div className="envelope" aria-hidden>
+        <div className="envelope-flap" />
+        <div className="embossed-sprig sprig-top-left">❦</div>
+        <div className="embossed-sprig sprig-top-right">❦</div>
+        <div className="embossed-sprig sprig-bottom-left">❦</div>
+        <div className="embossed-sprig sprig-bottom-right">❦</div>
+        <div className="envelope-prompt"><span>⌃</span>Tap to open</div>
+      </div>
       <Button className="wax-seal" onClick={open} aria-label="Open invitation"><span>{initials(data)}</span></Button>
-      <p><span>⌃</span>Tap to open</p>
     </div>}
     <div className="invitation-story" aria-hidden={!opened}>
       <section className="invitation-cover paper-panel">
