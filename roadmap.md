@@ -10,3 +10,7 @@
 - [x] Remove dress code and gift preference pages
 - [x] Add illustrated location treatment
 - [x] Replace slide-like section motion with smooth fades and verify mobile interactions
+- [x] Remove the heart date and post-schedule photo sections
+- [x] Make the full invitation edge-to-edge across phone widths
+- [x] Improve numeric typography and schedule time legibility
+- [x] Add JSON-backed contact details to the final page
