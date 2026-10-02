@@ -1,8 +1,7 @@
 # Roadmap
 
-- [x] Replace green invitation surfaces with ivory, wine, and antique gold
-- [x] Add royal border ornamentation to invitation panels
-- [x] Add default royal music and persistent bottom-right sound control
-- [x] Improve mobile envelope lighting and preview fit
-- [x] Convert RSVP into a full-screen overlay with expanded fields
-- [x] Verify all requested mobile sizes and interactions
+- [ ] Make the home page open the invitation directly
+- [ ] Move all invitation values into one JSON file
+- [ ] Refine the Sacred Garden card composition from the supplied references
+- [ ] Keep the slug invitation route on the same JSON-backed template
+- [ ] Verify opening, music, RSVP, and mobile widths
