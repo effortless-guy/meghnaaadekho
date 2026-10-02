@@ -204,6 +204,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .preview-frame.mobile { width: min(390px, 100%); border: 8px solid var(--foreground); border-radius: 28px; }
 .preview-frame.desktop { width: min(100%, 1100px); }
 .preview-frame .envelope-gate { position: absolute; }
+.preview-frame .envelope-gate .envelope { width: min(72%, 280px); max-height: calc(100% - 42px); }
 .publish-panel { margin-top: 38px; display: grid; gap: 18px; text-align: center; }
 .publish-monogram { margin: auto; display: grid; place-items: center; width: 86px; height: 86px; border-radius: 50%; background: var(--burgundy); color: var(--gold); font: italic 30px var(--font-display); }
 .publish-panel h2 { font: 42px var(--font-display); }
