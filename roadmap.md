@@ -16,3 +16,4 @@
 - [x] Add JSON-backed contact details to the final page
 - [x] Replace decorative numeral styling with clean, readable numerals
 - [x] Redesign the final page as an image-free contact directory
+- [x] Add alternating flower reveals across each torn-paper page transition
