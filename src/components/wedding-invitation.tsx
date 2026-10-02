@@ -91,6 +91,7 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
     context.fill();
     context.restore();
     scratchMoves.current += 1;
+    if (scratchMoves.current > 3) setRevealed(true);
   }
 
   function finish() {
@@ -106,6 +107,7 @@ function ScratchHeart({ label, value }: { label: string; value: string }) {
       onPointerDown={(event) => { drawing.current = true; event.currentTarget.setPointerCapture(event.pointerId); scratch(event); }}
       onPointerMove={scratch}
       onPointerUp={finish}
+      onPointerLeave={finish}
       onPointerCancel={finish}
     />
   </div>;
