@@ -336,7 +336,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 
 /* Page-break rhythm: torn paper sheets + scroll reveal */
-.invitation .invitation-story > section.letter-section, .invitation .invitation-story > section.venue-section, .invitation .invitation-story > section.events-section, .invitation .invitation-story > section.countdown-section, .invitation .invitation-story > section.rsvp-section, .invitation .invitation-story > section.photo-interlude { min-height: auto; }
+.invitation .invitation-story > section.letter-section, .invitation .invitation-story > section.venue-section, .invitation .invitation-story > section.events-section, .invitation .invitation-story > section.countdown-section, .invitation .invitation-story > section.rsvp-section { min-height: auto; }
+.invitation .invitation-story > section.photo-interlude { min-height: 62svh; }
 .invitation .invitation-story > section.portrait-panel { min-height: 88svh; }
 .invitation .details-section article { min-height: auto; padding: 56px 30px; }
 .invitation .invitation-story { background: var(--invite-bg); }

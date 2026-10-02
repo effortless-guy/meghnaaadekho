@@ -14,6 +14,7 @@ import envelopePaper from "@/assets/envelope-paper.jpg.asset.json";
 import waxSeal from "@/assets/wax-seal.png.asset.json";
 import classicalTune from "@/assets/classical-canon.mp3.asset.json";
 import archLoop from "@/assets/arch-swan-loop.mp4.asset.json";
+import archLoopWebm from "@/assets/arch-swan-loop.webm.asset.json";
 import archPoster from "@/assets/arch-swan-poster.jpg.asset.json";
 
 const SPARKLES: [number, number, number][] = [[22, 18, 0], [74, 14, .35], [15, 42, .7], [84, 38, .2], [30, 62, .9], [70, 66, .5], [18, 84, 1.1], [80, 86, .8], [48, 30, 1.3], [52, 76, 1.5], [36, 50, 1.7], [64, 46, 1.9]];
@@ -144,7 +145,7 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
     </div>}
     <div className="invitation-story" ref={story} aria-hidden={!opened}>
       <section className="invitation-cover arch-cover">
-        <video className="arch-cover-art" src={archLoop.url} poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden />
+        <video className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
         <div className="arch-cover-copy"><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
       <section className="portrait-panel reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
