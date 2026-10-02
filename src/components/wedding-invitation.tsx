@@ -13,7 +13,11 @@ import detailPhoto from "@/assets/wedding-detail.jpg";
 import envelopePaper from "@/assets/envelope-paper.jpg.asset.json";
 import waxSeal from "@/assets/wax-seal.png.asset.json";
 import classicalTune from "@/assets/classical-canon.mp3.asset.json";
-import archCover from "@/assets/arch-swan-cover.jpg";
+import archLoop from "@/assets/arch-swan-loop.mp4.asset.json";
+import archLoopWebm from "@/assets/arch-swan-loop.webm.asset.json";
+import archPoster from "@/assets/arch-swan-poster.jpg.asset.json";
+
+const SPARKLES: [number, number, number][] = [[22, 18, 0], [74, 14, .35], [15, 42, .7], [84, 38, .2], [30, 62, .9], [70, 66, .5], [18, 84, 1.1], [80, 86, .8], [48, 30, 1.3], [52, 76, 1.5], [36, 50, 1.7], [64, 46, 1.9]];
 
 function initials(data: WeddingData) {
   return `${data.couple.groom.charAt(0)}&${data.couple.bride.charAt(0)}`;
@@ -108,11 +112,26 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   const audioSrc = data.music.url || classicalTune.url;
   useEffect(() => { if (!playing) audio.current?.pause(); }, [playing]);
   useEffect(() => { if (audio.current) audio.current.muted = muted; }, [muted]);
+  const story = useRef<HTMLDivElement>(null);
+  const coverVideo = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = coverVideo.current;
+    if (!video) return;
+    video.muted = true;
+    video.play().catch(() => undefined);
+  }, [opening]);
+  useEffect(() => {
+    if (!opened || !story.current) return;
+    const targets = story.current.querySelectorAll<HTMLElement>(".reveal");
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("is-visible"); observer.unobserve(entry.target); } }), { threshold: 0.18 });
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, [opened]);
   function open() {
     if (opening) return;
     setOpening(true);
-    window.setTimeout(() => setOpened(true), 4300);
-    window.setTimeout(() => setGateGone(true), 6200);
+    window.setTimeout(() => setOpened(true), 6400);
+    window.setTimeout(() => setGateGone(true), 8800);
   }
   async function toggleMusic() {
     if (!audio.current) return;
@@ -123,27 +142,29 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
     <audio ref={audio} src={audioSrc} loop preload="auto" />
     {!gateGone && <div className={`envelope-gate ${opening ? "is-opening" : ""} ${opened ? "is-leaving" : ""}`}>
       <div className="envelope" onClick={open} style={{ "--env-paper": `url(${envelopePaper.url})` } as CSSProperties}>
-        <div className="envelope-letter" aria-hidden style={{ backgroundImage: `url(${archCover})` }} />
+        <div className="envelope-glow" aria-hidden />
         {(["left", "right", "bottom", "top"] as const).map((side) => <div key={side} className={`env-flap env-flap-${side}`} aria-hidden><div className="env-face env-front" /><div className="env-face env-back" /></div>)}
         <div className="envelope-shine" aria-hidden />
+        <div className="envelope-sparkles" aria-hidden>{SPARKLES.map(([x, y, d], i) => <i key={i} style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${d}s` }} />)}</div>
         <button type="button" className="wax-seal" onClick={(event) => { event.stopPropagation(); open(); }} aria-label="Tap to open invitation"><img src={waxSeal.url} alt="" draggable={false} /><span>{initials(data)}</span></button>
       </div>
+      <div className="envelope-flash" aria-hidden />
     </div>}
-    <div className="invitation-story" aria-hidden={!opened}>
+    <div className="invitation-story" ref={story} aria-hidden={!opened}>
       <section className="invitation-cover arch-cover">
-        <img className="arch-cover-art" src={archCover} alt="" width={1024} height={1792} />
-        <div className="arch-cover-copy"><p className="arch-script">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-script arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
+        <video ref={coverVideo} className="arch-cover-art" poster={archPoster.url} autoPlay muted loop playsInline preload="auto" aria-hidden><source src={archLoop.url} type="video/mp4" /><source src={archLoopWebm.url} type="video/webm" /></video>
+        <div className="arch-cover-copy"><p className="arch-label">Wedding Day</p><time>{shortDate}</time><h1><span>{data.couple.groom}</span><i>&</i><span>{data.couple.bride}</span></h1><p className="arch-label arch-scroll">Scroll down</p><span className="arch-chevron" aria-hidden /></div>
       </section>
-      <section className="portrait-panel"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
-      {!royal && <section className="letter-section ornamented"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
+      <section className="portrait-panel reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div><span className="floral-edge floral-edge-left" aria-hidden>❦</span><span className="floral-edge floral-edge-right" aria-hidden>❦</span></section>
+      {!royal && <section className="letter-section ornamented torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
-      <section className="countdown-section"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
-      {data.visibility['events'] && <section className="events-section ornamented"><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
-      <section className="photo-interlude"><img src={detailPhoto} alt="Wedding rings and olive bouquet" loading="lazy" width={1024} height={1024} /><blockquote>“And so the adventure begins.”</blockquote></section>
-      {data.visibility['venue'] && <section className="venue-section"><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><div className="venue-sketch" aria-hidden><span>♙</span><span>⌂</span><span>♙</span></div><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">Open in maps</a></Button></section>}
-      <section className="details-section"><article><CalendarDays aria-hidden /><p className="script-title">Dress Code</p><p>{data.dressCode}</p></article><article><span className="gift-mark">✦</span><p className="script-title">Gift Preference</p><p>{data.giftNote}</p></article></section>
-      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section"><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
-      <footer><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><img src={sacredHero} alt={`${data.couple.groom} and ${data.couple.bride}`} loading="lazy" width={1024} height={1536} /><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
+      <section className="countdown-section reveal"><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
+      {data.visibility['events'] && <section className="events-section ornamented torn-sheet reveal"><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
+      <section className="photo-interlude reveal"><img src={detailPhoto} alt="Wedding rings and olive bouquet" loading="lazy" width={1024} height={1024} /><blockquote>“And so the adventure begins.”</blockquote></section>
+      {data.visibility['venue'] && <section className="venue-section reveal"><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><div className="venue-sketch" aria-hidden><span>♙</span><span>⌂</span><span>♙</span></div><Button asChild variant="outline"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer">Open in maps</a></Button></section>}
+      <section className="details-section torn-sheet reveal"><article><CalendarDays aria-hidden /><p className="script-title">Dress Code</p><p>{data.dressCode}</p></article><article><span className="gift-mark">✦</span><p className="script-title">Gift Preference</p><p>{data.giftNote}</p></article></section>
+      {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section torn-sheet reveal"><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
+      <footer className="reveal"><p>Hope to see you there!</p><h2>{data.couple.groom} <i>&</i> {data.couple.bride}</h2><img src={sacredHero} alt={`${data.couple.groom} and ${data.couple.bride}`} loading="lazy" width={1024} height={1536} /><div className="monogram">{initials(data)}</div><small>With love, always</small></footer>
     </div>
     <div className="sound-controls" aria-label="Music"><Button size="icon" variant="outline" onClick={toggleMusic} aria-pressed={playing} aria-label={playing ? "Turn music off" : "Turn music on"}>{playing ? <Volume2 /> : <VolumeX />}</Button></div>
   </main>;
