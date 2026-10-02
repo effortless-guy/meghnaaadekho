@@ -14,7 +14,7 @@ import embossedBotanicals from "@/assets/embossed-envelope-botanicals.png";
 import royalProcessional from "@/assets/royal-wedding-processional.wav.asset.json";
 
 function initials(data: WeddingData) {
-  return `${data.couple.groom.charAt(0)}${data.couple.bride.charAt(0)}`;
+  return `${data.couple.groom.charAt(0)}&${data.couple.bride.charAt(0)}`;
 }
 
 function Countdown({ date }: { date: string }) {
