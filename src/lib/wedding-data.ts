@@ -21,9 +21,9 @@ export interface WeddingData {
   gallery: string[];
   dressCode: string;
   giftNote: string;
-  contacts: { name: string; phone: string; email?: string }[];
+  contacts: { name: string; phone: string; email?: string; whatsapp?: string; photo?: string }[];
   music: { enabled: boolean; url: string };
-  rsvp: { enabled: boolean; questions: string[] };
+  rsvp: { enabled: boolean; questions: string[]; googleFormUrl?: string };
   template: { templateId: TemplateId };
   visibility: Record<string, boolean>;
   publishing: { status: "draft" | "published" | "unpublished"; slug: string };

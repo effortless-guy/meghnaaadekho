@@ -55,7 +55,8 @@
     },
     {
       "name": "Arjun",
-      "phone": "+91 91234 56789"
+      "phone": "+91 91234 56789",
+      "whatsapp": "+91 91234 56789"
     }
   ],
   "music": {
@@ -64,7 +65,8 @@
   },
   "rsvp": {
     "enabled": true,
-    "questions": ["attendance", "partySize", "dietary", "message"]
+    "questions": ["attendance", "partySize", "dietary", "message"],
+    "googleFormUrl": ""
   },
   "template": {
     "templateId": "sacred-garden"
