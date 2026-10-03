@@ -199,18 +199,14 @@ function Rsvp({ invitationId, couple, googleFormUrl }: { invitationId?: string; 
         <DialogHeader className="rsvp-dialog-header"><span className="rsvp-crest" aria-hidden>❦</span><DialogTitle>Confirm Your Attendance</DialogTitle><DialogDescription>Kindly reply before 09 August</DialogDescription></DialogHeader>
         <form className="rsvp-form" onSubmit={submit}>
           <input name="website" tabIndex={-1} autoComplete="off" className="honeypot" aria-hidden="true" />
-          <label>Primary guest <span>*</span><input name="name" maxLength={100} required /></label>
-          <fieldset><legend>Representing family <span>*</span></legend><RadioGroup value={familySide} onValueChange={setFamilySide}><label><RadioGroupItem value="groom" />{couple.groom} — groom&apos;s side</label><label><RadioGroupItem value="bride" />{couple.bride} — bride&apos;s side</label></RadioGroup></fieldset>
-          <label>WhatsApp number <span>*</span><input name="whatsapp" type="tel" inputMode="tel" required /></label>
-          <fieldset><legend>Will you be attending?</legend><RadioGroup value={attending} onValueChange={setAttending}><label><RadioGroupItem value="yes" />Accepts with pleasure</label><label><RadioGroupItem value="no" />Declines with regret</label></RadioGroup></fieldset>
-          <label>Total guests attending <span>*</span><Select value={partySize} onValueChange={setPartySize}><SelectTrigger><SelectValue placeholder="Choose" /></SelectTrigger><SelectContent>{Array.from({ length: 10 }, (_, index) => <SelectItem key={index + 1} value={String(index + 1)}>{index + 1}</SelectItem>)}</SelectContent></Select></label>
-          <label>A song that gets you dancing<input name="song" maxLength={120} /></label>
-          <label>Children attending <small>Please include names and ages.</small><textarea name="children" maxLength={500} rows={2} /></label>
-          <label>Dietary requirements<textarea name="dietary" maxLength={500} rows={2} /></label>
-          <label>A note for the couple<textarea name="message" maxLength={500} rows={3} /></label>
+          <label>Your Name<input name="name" maxLength={100} required /></label>
+          <label>WhatsApp Number<input name="whatsapp" type="tel" inputMode="tel" required /></label>
+          <fieldset><legend>Which Side</legend><RadioGroup value={familySide} onValueChange={setFamilySide}><label><RadioGroupItem value="groom" />{couple.groom} — groom's side</label><label><RadioGroupItem value="bride" />{couple.bride} — bride's side</label></RadioGroup></fieldset>
+          <label>Total Guest Attending<Select value={partySize} onValueChange={setPartySize}><SelectTrigger><SelectValue placeholder="Choose" /></SelectTrigger><SelectContent>{Array.from({ length: 10 }, (_, index) => <SelectItem key={index + 1} value={String(index + 1)}>{index + 1}</SelectItem>)}</SelectContent></Select></label>
+          <label>A favourite song for dance<input name="song" maxLength={120} /></label>
+          <label>Children Attending<small>Please include names and ages.</small><textarea name="children" maxLength={500} rows={2} /></label>
           {error && <p className="form-error" role="alert">{error}</p>}
           <Button type="submit" size="lg">Send our reply</Button>
-        </form>
       </>}
     </DialogContent>
   </Dialog>;
