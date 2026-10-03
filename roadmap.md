@@ -19,3 +19,5 @@
 - [x] Add alternating flower reveals across each torn-paper page transition
 - [x] Add icon-led interactive styling to the maps and RSVP actions
 - [x] Add a conditional JSON-backed event-date page before the countdown
+- [x] Hide the event-date page behind a documented future switch
+- [x] Combine scratch-to-reveal date hearts and countdown on one themed page
