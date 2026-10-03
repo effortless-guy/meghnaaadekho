@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowUpRight, CalendarDays, Check, HeartHandshake, Mail, MapPin, Phone, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -29,13 +29,19 @@ function initials(data: WeddingData) {
 }
 
 function Countdown({ date }: { date: string }) {
-  const [now, setNow] = useState(0);
+  const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
     setNow(Date.now());
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
   const values = useMemo(() => {
+    if (now === null) return [
+      { label: "Days", value: "—" },
+      { label: "Hours", value: "—" },
+      { label: "Minutes", value: "—" },
+      { label: "Seconds", value: "—" },
+    ];
     const remaining = Math.max(0, new Date(`${date}T16:30:00`).getTime() - now);
     return [
       { label: "Days", value: Math.floor(remaining / 86400000) },
@@ -45,6 +51,102 @@ function Countdown({ date }: { date: string }) {
     ];
   }, [date, now]);
   return <div className="countdown">{values.map((item) => <div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div>;
+}
+
+function traceHeart(context: CanvasRenderingContext2D, size: number) {
+  context.beginPath();
+  context.moveTo(size / 2, size * .86);
+  context.bezierCurveTo(size * .42, size * .73, size * .12, size * .54, size * .12, size * .3);
+  context.bezierCurveTo(size * .12, size * .08, size * .39, size * .02, size / 2, size * .22);
+  context.bezierCurveTo(size * .61, size * .02, size * .88, size * .08, size * .88, size * .3);
+  context.bezierCurveTo(size * .88, size * .54, size * .58, size * .73, size / 2, size * .86);
+  context.closePath();
+}
+
+function ScratchHeart({ label, value, onReveal }: { label: string; value: string; onReveal: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const drawing = useRef(false);
+  const lastPoint = useRef<{ x: number; y: number } | null>(null);
+  const revealed = useRef(false);
+  const initialVisibleSamples = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const size = 180;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = size * ratio;
+    canvas.height = size * ratio;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.scale(ratio, ratio);
+    const finish = context.createLinearGradient(20, 20, 160, 160);
+    finish.addColorStop(0, "#b98a2d");
+    finish.addColorStop(.42, "#f6dfa0");
+    finish.addColorStop(.68, "#d4a94b");
+    finish.addColorStop(1, "#9b6720");
+    traceHeart(context, size);
+    context.fillStyle = finish;
+    context.fill();
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let index = 3; index < pixels.length; index += 64) if ((pixels[index] ?? 0) > 16) initialVisibleSamples.current += 1;
+  }, []);
+
+  function point(event: ReactPointerEvent<HTMLCanvasElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    return { x: (event.clientX - bounds.left) * (180 / bounds.width), y: (event.clientY - bounds.top) * (180 / bounds.height) };
+  }
+
+  function scratch(event: ReactPointerEvent<HTMLCanvasElement>) {
+    if (!drawing.current || revealed.current) return;
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context) return;
+    const next = point(event);
+    const previous = lastPoint.current ?? next;
+    const ratio = canvas.width / 180;
+    context.save();
+    context.scale(ratio, ratio);
+    context.globalCompositeOperation = "destination-out";
+    context.lineWidth = 22;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.beginPath();
+    context.moveTo(previous.x, previous.y);
+    context.lineTo(next.x, next.y);
+    context.stroke();
+    context.restore();
+    lastPoint.current = next;
+  }
+
+  function measure() {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d", { willReadFrequently: true });
+    if (!canvas || !context || revealed.current) return;
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let visible = 0;
+    for (let index = 3; index < pixels.length; index += 64) if ((pixels[index] ?? 0) > 16) visible += 1;
+    if (initialVisibleSamples.current > 0 && visible / initialVisibleSamples.current < .46) {
+      revealed.current = true;
+      canvas.classList.add("is-cleared");
+      onReveal();
+    }
+  }
+
+  function revealForKeyboard() {
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context || revealed.current) return;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    revealed.current = true;
+    canvas.classList.add("is-cleared");
+    onReveal();
+  }
+
+  return <div className="scratch-heart">
+    <div><small>{label}</small><strong>{value}</strong></div>
+    <canvas ref={canvasRef} role="button" tabIndex={0} aria-label={`Scratch to reveal ${label}`} onPointerDown={(event) => { drawing.current = true; lastPoint.current = point(event); event.currentTarget.setPointerCapture(event.pointerId); scratch(event); }} onPointerMove={scratch} onPointerUp={(event) => { drawing.current = false; lastPoint.current = null; event.currentTarget.releasePointerCapture(event.pointerId); measure(); }} onPointerCancel={() => { drawing.current = false; lastPoint.current = null; }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); revealForKeyboard(); } }} />
+  </div>;
 }
 
 const transitionFlowers = {
@@ -123,8 +225,14 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
   const [muted, setMuted] = useState(false);
   const audio = useRef<HTMLAudioElement>(null);
   const royal = data.template.templateId === "royal-celebration";
+  const [revealedDateParts, setRevealedDateParts] = useState<string[]>([]);
   const datedEvents = data.events.filter((event) => event.date.trim().length > 0);
-  const dateLabel = new Intl.DateTimeFormat("en", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${data.wedding.date}T12:00:00`));
+  const weddingDate = new Date(`${data.wedding.date}T12:00:00`);
+  const dateParts = [
+    { label: "Day", value: new Intl.DateTimeFormat("en", { day: "2-digit" }).format(weddingDate) },
+    { label: "Month", value: new Intl.DateTimeFormat("en", { month: "short" }).format(weddingDate) },
+    { label: "Year", value: new Intl.DateTimeFormat("en", { year: "numeric" }).format(weddingDate) },
+  ];
   const shortDate = data.wedding.date.split("-").reverse().map((part, index) => index === 2 ? part.slice(2) : part).join(".");
   const audioSrc = data.music.url || classicalTune.url;
   useEffect(() => { if (!playing) audio.current?.pause(); }, [playing]);
@@ -176,8 +284,9 @@ export function WeddingInvitation({ data, invitationId, preview = false }: { dat
       <section className="portrait-panel story-break reveal"><img src={royal ? royalHero : sacredHero} alt="Wedding couple in a ceremonial garden" width={1024} height={1536} /><div><p>Two souls</p><h2>One destiny</h2><span>A lifetime, written with love</span></div></section>
       {!royal && <section className="letter-section ornamented torn-sheet reveal"><FloralBreak flower="rose" side="left" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">Dear friends & family</p><h2>Our favourite chapter begins</h2><p>{data.intro.message}</p><p>{data.story}</p><div className="monogram">{initials(data)}</div><span className="fine-rule" /></section>}
       {royal && <section className="royal-proclamation"><div className="sun-mark">☼</div><p className="kicker">With the blessings of our families</p><h2>Two hearts. One celebration.</h2><p>{data.intro.message}</p></section>}
-      {datedEvents.length > 0 && <section className="event-dates-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><CalendarDays className="event-dates-icon" aria-hidden /><p className="kicker">Mark your calendar</p><h2>Dates to remember</h2><div className="event-date-list">{datedEvents.map((item, index) => <article key={`${item.name}-${item.date}-${index}`}><span aria-hidden>{index % 2 === 0 ? "❦" : "✦"}</span><div><h3>{item.name}</h3><time>{item.date}</time></div></article>)}</div></section>}
-      <section className="countdown-section torn-sheet reveal"><FloralBreak flower="jasmine" side="left" /><div className="botanical-mark" aria-hidden>❦</div><p className="kicker">The celebration begins in</p><Countdown date={data.wedding.date} /></section>
+      {/* Set this to true to restore the JSON-driven “Dates to remember” page. */}
+      {false && datedEvents.length > 0 && <section className="event-dates-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><CalendarDays className="event-dates-icon" aria-hidden /><p className="kicker">Mark your calendar</p><h2>Dates to remember</h2><div className="event-date-list">{datedEvents.map((item, index) => <article key={`${item.name}-${item.date}-${index}`}><span aria-hidden>{index % 2 === 0 ? "❦" : "✦"}</span><div><h3>{item.name}</h3><time>{item.date}</time></div></article>)}</div></section>}
+      <section className="countdown-section save-date-section torn-sheet reveal"><FloralBreak flower="jasmine" side="left" /><p className="kicker">Save the date</p><h2>Scratch below to reveal<br />our wedding date</h2><div className="scratch-hearts">{dateParts.map((part) => <ScratchHeart key={part.label} {...part} onReveal={() => setRevealedDateParts((current) => current.includes(part.label) ? current : [...current, part.label])} />)}</div><p className="scratch-note">Gently scratch each heart</p><div className={`revealed-countdown ${revealedDateParts.length === dateParts.length ? "is-visible" : ""}`} aria-hidden={revealedDateParts.length !== dateParts.length}><p>The celebration begins in</p><Countdown date={data.wedding.date} /></div></section>
       {data.visibility['events'] && <section className="events-section ornamented torn-sheet reveal"><FloralBreak flower="lotus" side="left" /><p className="kicker">Schedule of events</p><h2>{royal ? "Wedding festivities" : "A day to remember"}</h2><div className="event-list">{data.events.map((item, index) => <article key={`${item.name}-${index}`}><time>{item.time}</time><span aria-hidden>{index % 2 === 0 ? "❧" : "✦"}</span><div><h3>{item.name}</h3><p>{item.description}</p><small>{item.venue}</small></div></article>)}</div></section>}
       {data.visibility['venue'] && <section className="venue-section torn-sheet reveal"><FloralBreak flower="marigold" side="right" /><MapPin aria-hidden /><p className="kicker">Location</p><h2>{data.venue.name}</h2><p>{data.venue.address}</p><img className="venue-art" src={venueGardenPalace} alt="Watercolor garden palace at the wedding location" loading="lazy" width={1024} height={1280} /><Button asChild variant="outline" className="invitation-action map-action"><a href={data.venue.mapUrl} target="_blank" rel="noreferrer"><MapPin aria-hidden /><span>Open in maps</span><ArrowUpRight className="action-arrow" aria-hidden /></a></Button></section>}
       {data.rsvp.enabled && data.visibility['rsvp'] && <section className="rsvp-section torn-sheet reveal"><FloralBreak flower="rose" side="left" /><div className="botanical-mark" aria-hidden>❦</div><h2>Confirm Your Attendance</h2><p>To help us prepare for a joyful celebration, kindly confirm your attendance.</p><Rsvp couple={data.couple} {...(invitationId ? { invitationId } : {})} /></section>}
