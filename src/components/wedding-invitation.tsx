@@ -163,7 +163,6 @@ function FloralBreak({ flower, side }: { flower: keyof typeof transitionFlowers;
 function Rsvp({ invitationId, couple, googleFormUrl }: { invitationId?: string; couple: WeddingData["couple"]; googleFormUrl?: string }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
-  const [attending, setAttending] = useState("yes");
   const [familySide, setFamilySide] = useState("bride");
   const [partySize, setPartySize] = useState("1");
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -173,16 +172,14 @@ function Rsvp({ invitationId, couple, googleFormUrl }: { invitationId?: string; 
     if (!guestName || guestName.length > 100) { setError("Please enter your name."); return; }
     const details = [
       `Family: ${familySide === "bride" ? `${couple.bride}'s side` : `${couple.groom}'s side`}`,
-      `WhatsApp: ${String(form.get("whatsapp") ?? "").trim()}`,
       `Song: ${String(form.get("song") ?? "").trim() || "Not provided"}`,
       `Children: ${String(form.get("children") ?? "").trim() || "None listed"}`,
-      `Message: ${String(form.get("message") ?? "").trim() || "—"}`,
     ].join("\n");
     const response = {
       guest_name: guestName,
-      attending: attending === "yes",
+      attending: true,
       party_size: Math.min(20, Math.max(1, Number(partySize))),
-      dietary_requirements: String(form.get("dietary") ?? "").trim().slice(0, 500),
+      dietary_requirements: "",
       message: details.slice(0, 1000),
       website: String(form.get("website") ?? ""),
     };
