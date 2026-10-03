@@ -21,3 +21,6 @@
 - [x] Add a conditional JSON-backed event-date page before the countdown
 - [x] Hide the event-date page behind a documented future switch
 - [x] Combine scratch-to-reveal date hearts and countdown on one themed page
+- [x] Reduce heart numeral size so every date fits cleanly
+- [x] Add optional contact portraits and an Arjun WhatsApp action
+- [x] Support an optional Google Form RSVP link and document music customization
