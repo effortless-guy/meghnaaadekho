@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowUpRight, CalendarDays, Check, HeartHandshake, Mail, MapPin, Phone, Volume2, VolumeX } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,7 @@ function ScratchHeart({ label, value, onReveal }: { label: string; value: string
   const drawing = useRef(false);
   const lastPoint = useRef<{ x: number; y: number } | null>(null);
   const revealed = useRef(false);
+  const initialVisibleSamples = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -87,14 +88,16 @@ function ScratchHeart({ label, value, onReveal }: { label: string; value: string
     traceHeart(context, size);
     context.fillStyle = finish;
     context.fill();
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let index = 3; index < pixels.length; index += 64) if (pixels[index] > 16) initialVisibleSamples.current += 1;
   }, []);
 
-  function point(event: React.PointerEvent<HTMLCanvasElement>) {
+  function point(event: ReactPointerEvent<HTMLCanvasElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
     return { x: (event.clientX - bounds.left) * (180 / bounds.width), y: (event.clientY - bounds.top) * (180 / bounds.height) };
   }
 
-  function scratch(event: React.PointerEvent<HTMLCanvasElement>) {
+  function scratch(event: ReactPointerEvent<HTMLCanvasElement>) {
     if (!drawing.current || revealed.current) return;
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
@@ -123,7 +126,7 @@ function ScratchHeart({ label, value, onReveal }: { label: string; value: string
     const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
     let visible = 0;
     for (let index = 3; index < pixels.length; index += 64) if (pixels[index] > 16) visible += 1;
-    if (visible < 1250 * (canvas.width / 360) ** 2) {
+    if (initialVisibleSamples.current > 0 && visible / initialVisibleSamples.current < .46) {
       revealed.current = true;
       canvas.classList.add("is-cleared");
       onReveal();
