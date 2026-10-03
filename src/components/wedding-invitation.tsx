@@ -89,7 +89,7 @@ function ScratchHeart({ label, value, onReveal }: { label: string; value: string
     context.fillStyle = finish;
     context.fill();
     const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    for (let index = 3; index < pixels.length; index += 64) if (pixels[index] > 16) initialVisibleSamples.current += 1;
+    for (let index = 3; index < pixels.length; index += 64) if ((pixels[index] ?? 0) > 16) initialVisibleSamples.current += 1;
   }, []);
 
   function point(event: ReactPointerEvent<HTMLCanvasElement>) {
@@ -125,7 +125,7 @@ function ScratchHeart({ label, value, onReveal }: { label: string; value: string
     if (!canvas || !context || revealed.current) return;
     const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
     let visible = 0;
-    for (let index = 3; index < pixels.length; index += 64) if (pixels[index] > 16) visible += 1;
+    for (let index = 3; index < pixels.length; index += 64) if ((pixels[index] ?? 0) > 16) visible += 1;
     if (initialVisibleSamples.current > 0 && visible / initialVisibleSamples.current < .46) {
       revealed.current = true;
       canvas.classList.add("is-cleared");
