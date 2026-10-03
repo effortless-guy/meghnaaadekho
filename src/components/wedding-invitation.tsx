@@ -207,6 +207,7 @@ function Rsvp({ invitationId, couple, googleFormUrl }: { invitationId?: string; 
           <label>Children Attending<small>Please include names and ages.</small><textarea name="children" maxLength={500} rows={2} /></label>
           {error && <p className="form-error" role="alert">{error}</p>}
           <Button type="submit" size="lg">Send our reply</Button>
+        </form>
       </>}
     </DialogContent>
   </Dialog>;
