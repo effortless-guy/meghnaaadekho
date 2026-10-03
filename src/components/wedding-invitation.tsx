@@ -160,7 +160,7 @@ function FloralBreak({ flower, side }: { flower: keyof typeof transitionFlowers;
   return <img className={`page-flower page-flower-${side}`} src={transitionFlowers[flower]} alt="" loading="lazy" width={816} height={816} aria-hidden />;
 }
 
-function Rsvp({ invitationId, couple, googleFormUrl }: { invitationId?: string; couple: WeddingData["couple"]; googleFormUrl?: string }) {
+function Rsvp({ invitationId, couple, googleFormUrl }: { invitationId?: string | undefined; couple: WeddingData["couple"]; googleFormUrl?: string | undefined }) {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [familySide, setFamilySide] = useState("bride");
